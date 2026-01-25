@@ -62,8 +62,10 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         $result = $resend->emails->send($params);
         
-        if (isset($result->id)) {
-            error_log("Resend: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $result->id . ")");
+        // Check if result has id property (PHP 8.3 compatible)
+        $resultId = property_exists($result, 'id') ? $result->id : null;
+        if ($resultId !== null) {
+            error_log("Resend: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $resultId . ")");
             return true;
         } else {
             error_log("Resend Error: " . json_encode($result));
@@ -100,8 +102,10 @@ function sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_ms
         
         $result = $mg->messages()->send($mailgun_domain, $params);
         
-        if (isset($result->getId())) {
-            error_log("Mailgun: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $result->getId() . ")");
+        // Check if result has getId method and it returns non-null (PHP 8.3 compatible)
+        $resultId = null !== $result && method_exists($result, 'getId') ? $result->getId() : null;
+        if ($resultId !== null) {
+            error_log("Mailgun: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $resultId . ")");
             return true;
         } else {
             error_log("Mailgun Error: " . json_encode($result));
