@@ -13,23 +13,29 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     // 1. Resend (Recommended - easiest, great free tier)
     $resend_api_key = getenv('RESEND_API_KEY') ?: "";
     if (!empty($resend_api_key)) {
+        error_log("Using Resend API for email delivery");
         return sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+    } else {
+        error_log("RESEND_API_KEY not found, checking other services...");
     }
     
     // 2. Mailgun (Industry standard, excellent deliverability)
     $mailgun_api_key = getenv('MAILGUN_API_KEY') ?: "";
     $mailgun_domain = getenv('MAILGUN_DOMAIN') ?: "";
     if (!empty($mailgun_api_key) && !empty($mailgun_domain)) {
+        error_log("Using Mailgun API for email delivery");
         return sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
     }
     
     // 3. SendGrid (Good balance)
     $sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: "";
     if (!empty($sendgrid_api_key)) {
+        error_log("Using SendGrid API for email delivery");
         return sendEmailViaSendGrid($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
     }
     
     // 4. Fallback to SMTP (may not work on Railway due to blocked ports)
+    error_log("WARNING: No email API service configured (RESEND_API_KEY, MAILGUN_API_KEY, or SENDGRID_API_KEY). Falling back to SMTP which may not work on Railway.");
     return sendEmailViaSMTP($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
 }
 
