@@ -82,10 +82,11 @@ if (file_exists($autoloadPath)) {
         } else {
             error_log("GuzzleHttp\Client still not found, attempting manual load...");
             
-            // Fallback to manual loading
-            $guzzleBasePath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
+            // Fallback to manual loading (wrapped in try-catch to prevent fatal errors)
+            try {
+                $guzzleBasePath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
         
-            if (is_dir($guzzleBasePath)) {
+                if (is_dir($guzzleBasePath)) {
             // Load GuzzleHttp files in dependency order
             // First, load PSR interfaces that GuzzleHttp depends on
             $psrHttpClientPath = __DIR__ . '/../vendor/psr/http-client/src';
@@ -246,13 +247,14 @@ if (file_exists($autoloadPath)) {
                 }
             }
             
-            // Load GuzzleHttp core classes (ClientInterface should be loaded by now if it exists)
+            // Load GuzzleHttp core classes
+            // Note: Client.php might reference GuzzleHttp\ClientInterface which may not exist
+            // In GuzzleHttp 7.x, Client implements Psr\Http\Client\ClientInterface directly
             $coreFiles = [
                 'HandlerStack.php',
                 'RequestOptions.php',
                 'Utils.php',
-                'ClientTrait.php',
-                'Client.php'
+                'ClientTrait.php'
             ];
             foreach ($coreFiles as $file) {
                 $fullPath = $guzzleBasePath . '/' . $file;
@@ -261,8 +263,27 @@ if (file_exists($autoloadPath)) {
                         require_once $fullPath;
                     } catch (\Throwable $e) {
                         error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
-                        error_log("This might mean ClientInterface or another dependency is missing");
                     }
+                }
+            }
+            
+            // Try to load Client.php last - it might fail if ClientInterface doesn't exist
+            // but that's okay, we'll fall back to other email services
+            $clientFile = $guzzleBasePath . '/Client.php';
+            if (file_exists($clientFile)) {
+                // Check if we have the required PSR interface
+                if (interface_exists('Psr\Http\Client\ClientInterface', false)) {
+                    try {
+                        require_once $clientFile;
+                        if (class_exists('GuzzleHttp\Client', false)) {
+                            error_log("GuzzleHttp\Client loaded manually successfully");
+                        }
+                    } catch (\Throwable $e) {
+                        error_log("WARNING: Error loading Client.php: " . $e->getMessage());
+                        error_log("This is expected if GuzzleHttp\ClientInterface doesn't exist");
+                    }
+                } else {
+                    error_log("WARNING: Psr\Http\Client\ClientInterface not found, skipping Client.php manual load");
                 }
             }
             
@@ -273,6 +294,11 @@ if (file_exists($autoloadPath)) {
                 error_log("ERROR: GuzzleHttp\Client still not found after manual load");
                 error_log("GuzzleHttp base path: " . $guzzleBasePath);
                 error_log("GuzzleHttp base path exists: " . (is_dir($guzzleBasePath) ? "YES" : "NO"));
+            }
+            } catch (\Throwable $e) {
+                error_log("ERROR: Fatal error during manual GuzzleHttp loading: " . $e->getMessage());
+                error_log("ERROR Trace: " . $e->getTraceAsString());
+                error_log("Will fall back to other email services");
             }
         } else {
             error_log("ERROR: GuzzleHttp package directory not found at: " . $guzzleBasePath);
