@@ -2,6 +2,7 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use Resend\Resend;
 
 require('./vendor/autoload.php');
 require 'mailingvariables.php';
@@ -54,7 +55,7 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        $resend = \Resend::client($resend_api_key);
+        $resend = Resend::client($resend_api_key);
         
         $params = [
             'from' => $sender_name . ' <' . $sender_email . '>',
