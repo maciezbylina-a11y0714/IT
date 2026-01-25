@@ -11,12 +11,14 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     // Try email services in priority order (all work on Railway via HTTP API)
     
     // 1. Resend (Recommended - easiest, great free tier)
-    $resend_api_key = getenv('RESEND_API_KEY') ?: "";
+    // Try multiple methods to get environment variable (Railway compatibility)
+    $resend_api_key = getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? "");
     if (!empty($resend_api_key)) {
-        error_log("Using Resend API for email delivery");
+        error_log("Using Resend API for email delivery (API key length: " . strlen($resend_api_key) . ")");
         return sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
     } else {
-        error_log("RESEND_API_KEY not found, checking other services...");
+        error_log("RESEND_API_KEY not found via getenv() or \$_ENV, checking other services...");
+        error_log("Available env vars starting with RESEND: " . implode(", ", array_filter(array_keys($_ENV), function($k) { return strpos($k, 'RESEND') === 0; })));
     }
     
     // 2. Mailgun (Industry standard, excellent deliverability)
