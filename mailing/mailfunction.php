@@ -108,7 +108,7 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                     }
                     
                     // Recursively require all PHP files in Resend src directory
-                    // This ensures all dependencies are loaded before Resend.php
+                    // Load in proper dependency order: base classes first, then dependent ones
                     $resendSrcPath = $resendPackagePath . '/src';
                     $filesToLoad = [];
                     
@@ -124,13 +124,43 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                         }
                     }
                     
-                    // Sort files to load base classes before dependent ones
-                    // Load Resend.php last since it depends on everything else
+                    // Sort files to load in dependency order:
+                    // 1. Contracts (interfaces) first
+                    // 2. Resource.php (base class)
+                    // 3. Service.php (base service)
+                    // 4. ValueObjects
+                    // 5. Transporters
+                    // 6. Everything else
+                    // 7. Resend.php last
                     usort($filesToLoad, function($a, $b) {
-                        if (strpos($a, 'Resend.php') !== false) return 1; // Resend.php last
-                        if (strpos($b, 'Resend.php') !== false) return -1;
-                        return strcmp($a, $b);
+                        $aPath = str_replace('\\', '/', $a);
+                        $bPath = str_replace('\\', '/', $b);
+                        
+                        // Resend.php always last
+                        if (strpos($aPath, '/Resend.php') !== false) return 1;
+                        if (strpos($bPath, '/Resend.php') !== false) return -1;
+                        
+                        // Contracts first
+                        $aIsContract = strpos($aPath, '/Contracts/') !== false;
+                        $bIsContract = strpos($bPath, '/Contracts/') !== false;
+                        if ($aIsContract && !$bIsContract) return -1;
+                        if (!$aIsContract && $bIsContract) return 1;
+                        
+                        // Resource.php before other files
+                        if (strpos($aPath, '/Resource.php') !== false) return -1;
+                        if (strpos($bPath, '/Resource.php') !== false) return 1;
+                        
+                        // Service.php before files that use it
+                        if (strpos($aPath, '/Service/Service.php') !== false) return -1;
+                        if (strpos($bPath, '/Service/Service.php') !== false) return 1;
+                        
+                        return strcmp($aPath, $bPath);
                     });
+                    
+                    // Ensure GuzzleHttp is loaded via autoloader (it's a Composer dependency)
+                    if (!class_exists('GuzzleHttp\Client', true)) {
+                        error_log("WARNING: GuzzleHttp\Client not found, but should be autoloaded");
+                    }
                     
                     // Load all files
                     foreach ($filesToLoad as $file) {
