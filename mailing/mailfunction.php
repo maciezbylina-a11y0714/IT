@@ -93,36 +93,27 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
             if (is_dir($resendPackagePath)) {
                 error_log("Resend package directory exists: YES");
                 
-                // The autoloader should handle this, but if it's not working,
-                // we need to ensure the autoloader is properly registered
-                // Try to regenerate autoloader or check composer autoload files
-                $autoloadFiles = [
-                    __DIR__ . '/../vendor/autoload.php',
-                    __DIR__ . '/../vendor/composer/autoload_real.php',
-                ];
-                
-                foreach ($autoloadFiles as $file) {
-                    if (file_exists($file)) {
-                        require_once $file;
-                        error_log("Loaded autoloader file: " . $file);
+                // Resend class is in global namespace, but autoloader may not be finding it
+                // Try to manually require the Resend.php file and ensure autoloader loads dependencies
+                $resendMainFile = $resendPackagePath . '/src/Resend.php';
+                if (file_exists($resendMainFile)) {
+                    error_log("Resend main file exists: " . $resendMainFile);
+                    
+                    // First, ensure autoloader is loaded for dependencies
+                    // Resend uses Resend\Client, Resend\ValueObjects\ApiKey, etc.
+                    // These should be autoloaded when we require Resend.php
+                    require_once $resendMainFile;
+                    error_log("Manually required Resend.php file");
+                    
+                    // Now check if the class exists
+                    if (class_exists('Resend', false)) {
+                        $resendClass = 'Resend';
+                        error_log("Resend class found after manual require");
+                    } else {
+                        error_log("ERROR: Resend class still not found after manual require");
                     }
-                }
-                
-                // Now try to trigger autoload by checking for the class
-                // This should trigger the autoloader to load Resend and all dependencies
-                spl_autoload_call('Resend');
-                spl_autoload_call('Resend\Resend');
-                spl_autoload_call('Resend\ValueObjects\ApiKey');
-                
-                // Try again after triggering autoload
-                if (class_exists('Resend', true)) {
-                    $resendClass = 'Resend';
-                    error_log("Resend class found after autoload trigger");
-                } elseif (class_exists('Resend\Resend', true)) {
-                    $resendClass = 'Resend\Resend';
-                    error_log("Resend\Resend class found after autoload trigger");
                 } else {
-                    error_log("Resend class still not found after autoload trigger");
+                    error_log("Resend main file not found at: " . $resendMainFile);
                 }
             } else {
                 error_log("Resend package directory does not exist at: " . $resendPackagePath);
