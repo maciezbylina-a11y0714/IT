@@ -107,29 +107,40 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                         error_log("Autoloader loaded");
                     }
                     
-                    // Manually require all Resend dependencies before requiring Resend.php
-                    // The autoloader isn't finding them, so we'll load them directly
+                    // Recursively require all PHP files in Resend src directory
+                    // This ensures all dependencies are loaded before Resend.php
                     $resendSrcPath = $resendPackagePath . '/src';
-                    $dependencyFiles = [
-                        $resendSrcPath . '/ValueObjects/ApiKey.php',
-                        $resendSrcPath . '/ValueObjects/Transporter/BaseUri.php',
-                        $resendSrcPath . '/ValueObjects/Transporter/Headers.php',
-                        $resendSrcPath . '/Transporters/HttpTransporter.php',
-                        $resendSrcPath . '/Client.php',
-                    ];
+                    $filesToLoad = [];
                     
-                    foreach ($dependencyFiles as $file) {
-                        if (file_exists($file)) {
-                            require_once $file;
-                            error_log("Loaded: " . basename($file));
-                        } else {
-                            error_log("WARNING: Dependency file not found: " . $file);
+                    // Recursively find all PHP files
+                    $iterator = new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($resendSrcPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                        RecursiveIteratorIterator::SELF_FIRST
+                    );
+                    
+                    foreach ($iterator as $file) {
+                        if ($file->isFile() && $file->getExtension() === 'php') {
+                            $filesToLoad[] = $file->getPathname();
                         }
                     }
                     
-                    // Now require Resend.php - dependencies should already be loaded
-                    require_once $resendMainFile;
-                    error_log("Manually required Resend.php file");
+                    // Sort files to load base classes before dependent ones
+                    // Load Resend.php last since it depends on everything else
+                    usort($filesToLoad, function($a, $b) {
+                        if (strpos($a, 'Resend.php') !== false) return 1; // Resend.php last
+                        if (strpos($b, 'Resend.php') !== false) return -1;
+                        return strcmp($a, $b);
+                    });
+                    
+                    // Load all files
+                    foreach ($filesToLoad as $file) {
+                        try {
+                            require_once $file;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                        }
+                    }
+                    error_log("Loaded " . count($filesToLoad) . " Resend PHP files");
                     
                     // Verify the class exists
                     if (class_exists('Resend', false)) {
