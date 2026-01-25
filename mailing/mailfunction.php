@@ -157,30 +157,14 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                         return strcmp($aPath, $bPath);
                     });
                     
-                    // Ensure GuzzleHttp is loaded via autoloader (it's a Composer dependency)
-                    // Trigger autoloader for GuzzleHttp before loading Resend files
-                    if (!class_exists('GuzzleHttp\Client', true)) {
-                        error_log("WARNING: GuzzleHttp\Client not found via autoloader");
-                        // Try to manually trigger autoload
-                        spl_autoload_call('GuzzleHttp\Client');
-                        if (!class_exists('GuzzleHttp\Client', false)) {
-                            error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
-                            // Try to manually require GuzzleHttp Client file
-                            $guzzleClientFile = __DIR__ . '/../vendor/guzzlehttp/guzzle/src/Client.php';
-                            if (file_exists($guzzleClientFile)) {
-                                require_once $guzzleClientFile;
-                                error_log("Manually required GuzzleHttp\Client.php");
-                                if (class_exists('GuzzleHttp\Client', false)) {
-                                    error_log("GuzzleHttp\Client loaded via manual require");
-                                }
-                            } else {
-                                error_log("ERROR: GuzzleHttp Client.php not found at: " . $guzzleClientFile);
-                            }
-                        } else {
-                            error_log("GuzzleHttp\Client loaded via spl_autoload_call");
-                        }
-                    } else {
+                    // GuzzleHttp should be autoloaded by Composer when needed
+                    // Just verify the autoloader can find it - don't manually require
+                    // because GuzzleHttp has many dependencies that the autoloader handles
+                    if (class_exists('GuzzleHttp\Client', true)) {
                         error_log("GuzzleHttp\Client found via autoloader");
+                    } else {
+                        error_log("WARNING: GuzzleHttp\Client not found via autoloader, but autoloader should handle it when Resend uses it");
+                        // Don't manually require - let the autoloader handle it when Resend.php uses it
                     }
                     
                     // Load all files
@@ -214,7 +198,13 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         }
         
         // Instantiate Resend client
+        // The autoloader will handle GuzzleHttp\Client when Resend::client() uses it
         try {
+            // Ensure autoloader is ready for GuzzleHttp dependencies
+            if (!class_exists('GuzzleHttp\Client', true)) {
+                error_log("WARNING: GuzzleHttp\Client not pre-loaded, but autoloader should handle it");
+            }
+            
             $resend = $resendClass::client($resend_api_key);
             error_log("Resend: Client initialized successfully using class: " . $resendClass);
         } catch (\Exception $e) {
