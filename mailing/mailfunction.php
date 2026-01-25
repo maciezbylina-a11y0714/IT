@@ -42,8 +42,15 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
 function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false) {
     try {
         $resend_api_key = getenv('RESEND_API_KEY');
+        if (empty($resend_api_key)) {
+            error_log("ERROR: RESEND_API_KEY is empty or not set!");
+            return false;
+        }
+        
         $sender_email = getenv('MAIL_USERNAME') ?: $GLOBALS['mail_sender_email'];
         $sender_name = getenv('MAIL_FROM_NAME') ?: $GLOBALS['mail_sender_name'];
+        
+        error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
         $resend = \Resend::client($resend_api_key);
         
@@ -66,6 +73,7 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
             ];
         }
         
+        error_log("Resend: Sending email to " . $mail_reciever_email . " from " . $sender_email);
         $result = $resend->emails->send($params);
         
         // Check if result has id property (PHP 8.3 compatible)
@@ -74,11 +82,16 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
             error_log("Resend: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $resultId . ")");
             return true;
         } else {
-            error_log("Resend Error: " . json_encode($result));
+            error_log("Resend Error: Result does not have id. Result: " . json_encode($result));
             return false;
         }
     } catch (Exception $e) {
         error_log("Resend Exception: " . $e->getMessage());
+        error_log("Resend Exception Trace: " . $e->getTraceAsString());
+        return false;
+    } catch (\Throwable $e) {
+        error_log("Resend Throwable: " . $e->getMessage());
+        error_log("Resend Throwable Trace: " . $e->getTraceAsString());
         return false;
     }
 }
