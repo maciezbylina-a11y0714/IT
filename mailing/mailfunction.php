@@ -54,27 +54,32 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        // Check if Resend package is installed and find the correct class
-        if (!class_exists('Resend') && !class_exists('\Resend\Resend') && !class_exists('\Resend\Client')) {
-            error_log("ERROR: Resend PHP package not found! Make sure 'resend/resend-php' is installed via Composer.");
-            error_log("Run: composer require resend/resend-php");
+        // Try to manually load Resend class if autoloader hasn't loaded it yet
+        $resendClassFile = __DIR__ . '/../vendor/resend/resend-php/src/Resend.php';
+        if (file_exists($resendClassFile) && !class_exists('Resend', false)) {
+            require_once $resendClassFile;
+            error_log("Resend: Manually loaded Resend class from: " . $resendClassFile);
+        }
+        
+        // Check if Resend class is now available
+        if (!class_exists('Resend', false)) {
+            error_log("ERROR: Resend class not found after autoload and manual load attempt.");
+            error_log("Resend class file exists: " . (file_exists($resendClassFile) ? "YES" : "NO"));
+            error_log("Vendor directory exists: " . (is_dir(__DIR__ . '/../vendor') ? "YES" : "NO"));
             return false;
         }
         
-        // Try different ways to instantiate Resend client
+        // Instantiate Resend client (class is in global namespace)
         try {
-            if (class_exists('\Resend\Resend')) {
-                $resend = \Resend\Resend::client($resend_api_key);
-            } elseif (class_exists('Resend')) {
-                $resend = Resend::client($resend_api_key);
-            } elseif (class_exists('\Resend\Client')) {
-                $resend = new \Resend\Client($resend_api_key);
-            } else {
-                error_log("ERROR: Could not find Resend class. Package may not be installed correctly.");
-                return false;
-            }
+            $resend = Resend::client($resend_api_key);
+            error_log("Resend: Client initialized successfully");
         } catch (\Exception $e) {
             error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
+            error_log("ERROR Trace: " . $e->getTraceAsString());
+            return false;
+        } catch (\Throwable $e) {
+            error_log("ERROR: Failed to initialize Resend client (Throwable): " . $e->getMessage());
+            error_log("ERROR Trace: " . $e->getTraceAsString());
             return false;
         }
         
