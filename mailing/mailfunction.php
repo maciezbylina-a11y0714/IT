@@ -11,7 +11,11 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $mail = new PHPMailer();
     $mail->isSMTP();
 
-    //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+    // Enable debug for troubleshooting (disable in production)
+    $mail->SMTPDebug = SMTP::DEBUG_OFF; // Set to SMTP::DEBUG_SERVER for detailed logs
+    $mail->Debugoutput = function($str, $level) {
+        error_log("PHPMailer: $str");
+    };
 
     $mail->Host = $GLOBALS['mail_host'];
 
@@ -43,8 +47,10 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $mail->AltBody = 'This is a plain-text message body';
  
     if (!$mail->send()) {
+        error_log("PHPMailer Error: " . $mail->ErrorInfo);
         return false;
     } else {
+        error_log("Email sent successfully to: " . $mail_reciever_email);
         return true;
     }
 }
