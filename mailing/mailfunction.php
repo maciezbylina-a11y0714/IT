@@ -7,6 +7,10 @@ use PHPMailer\PHPMailer\SMTP;
 $autoloadPath = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoloadPath)) {
     require_once $autoloadPath;
+    // Verify autoloader loaded correctly
+    if (!function_exists('spl_autoload_functions') || count(spl_autoload_functions()) == 0) {
+        error_log("WARNING: No autoloaders registered after requiring autoload.php");
+    }
 } else {
     // Fallback to relative path
     require('./vendor/autoload.php');
@@ -158,23 +162,24 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                     });
                     
                     // GuzzleHttp should be autoloaded by Composer when needed
-                    // Try to ensure autoloader is working by checking for GuzzleHttp
-                    // The autoloader should handle GuzzleHttp when Resend uses it
+                    // GuzzleHttp uses PSR-4 autoloading, so the autoloader should handle it
+                    // But let's verify the autoloader can find it
                     if (!class_exists('GuzzleHttp\Client', true)) {
                         error_log("WARNING: GuzzleHttp\Client not found via autoloader");
-                        // Try to explicitly trigger autoloader registration
-                        // The autoloader should be registered from vendor/autoload.php
-                        // but let's make sure it's active
-                        if (function_exists('spl_autoload_functions')) {
-                            $autoloaders = spl_autoload_functions();
-                            error_log("Registered autoloaders: " . count($autoloaders));
-                        }
-                        // Try spl_autoload_call to trigger autoloader
-                        spl_autoload_call('GuzzleHttp\Client');
-                        if (class_exists('GuzzleHttp\Client', false)) {
-                            error_log("GuzzleHttp\Client loaded via spl_autoload_call");
+                        // Check if GuzzleHttp package exists
+                        $guzzlePath = __DIR__ . '/../vendor/guzzlehttp/guzzle';
+                        if (is_dir($guzzlePath)) {
+                            error_log("GuzzleHttp package exists at: " . $guzzlePath);
+                            // Try to manually trigger autoloader - it should work
+                            spl_autoload_call('GuzzleHttp\Client');
+                            if (class_exists('GuzzleHttp\Client', false)) {
+                                error_log("GuzzleHttp\Client loaded via spl_autoload_call");
+                            } else {
+                                error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
+                                error_log("This may indicate the autoloader is not properly configured for GuzzleHttp");
+                            }
                         } else {
-                            error_log("ERROR: GuzzleHttp\Client still not found - autoloader may not be working");
+                            error_log("ERROR: GuzzleHttp package not found at: " . $guzzlePath);
                         }
                     } else {
                         error_log("GuzzleHttp\Client found via autoloader");
