@@ -12,7 +12,7 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $mail->isSMTP();
 
     // Enable debug for troubleshooting (disable in production)
-    $mail->SMTPDebug = SMTP::DEBUG_OFF; // Set to SMTP::DEBUG_SERVER for detailed logs
+    $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Temporarily enabled to diagnose SMTP connection issues
     $mail->Debugoutput = function($str, $level) {
         error_log("PHPMailer: $str");
     };
