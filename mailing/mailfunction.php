@@ -87,221 +87,222 @@ if (file_exists($autoloadPath)) {
                 $guzzleBasePath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
         
                 if (is_dir($guzzleBasePath)) {
-            // Load GuzzleHttp files in dependency order
-            // First, load PSR interfaces that GuzzleHttp depends on
-            $psrHttpClientPath = __DIR__ . '/../vendor/psr/http-client/src';
-            if (is_dir($psrHttpClientPath)) {
-                $psrFiles = [
-                    'ClientInterface.php',
-                    'ClientExceptionInterface.php',
-                    'NetworkExceptionInterface.php',
-                    'RequestExceptionInterface.php'
-                ];
-                foreach ($psrFiles as $file) {
-                    $fullPath = $psrHttpClientPath . '/' . $file;
-                    if (file_exists($fullPath)) {
-                        require_once $fullPath;
+                    // Load GuzzleHttp files in dependency order
+                    // First, load PSR interfaces that GuzzleHttp depends on
+                    $psrHttpClientPath = __DIR__ . '/../vendor/psr/http-client/src';
+                    if (is_dir($psrHttpClientPath)) {
+                        $psrFiles = [
+                            'ClientInterface.php',
+                            'ClientExceptionInterface.php',
+                            'NetworkExceptionInterface.php',
+                            'RequestExceptionInterface.php'
+                        ];
+                        foreach ($psrFiles as $file) {
+                            $fullPath = $psrHttpClientPath . '/' . $file;
+                            if (file_exists($fullPath)) {
+                                require_once $fullPath;
+                            }
+                        }
                     }
-                }
-            }
-            
-            // Load GuzzleHttp Promise classes first (dependencies)
-            $promisePath = $guzzleBasePath . '/Promise';
-            if (is_dir($promisePath)) {
-                $promiseFiles = [
-                    'PromiseInterface.php',
-                    'Create.php',
-                    'Promise.php',
-                    'RejectionException.php',
-                    'TaskQueue.php',
-                    'TaskQueueInterface.php',
-                    'Utils.php'
-                ];
-                foreach ($promiseFiles as $file) {
-                    $fullPath = $promisePath . '/' . $file;
-                    if (file_exists($fullPath)) {
-                        require_once $fullPath;
+                    
+                    // Load GuzzleHttp Promise classes first (dependencies)
+                    $promisePath = $guzzleBasePath . '/Promise';
+                    if (is_dir($promisePath)) {
+                        $promiseFiles = [
+                            'PromiseInterface.php',
+                            'Create.php',
+                            'Promise.php',
+                            'RejectionException.php',
+                            'TaskQueue.php',
+                            'TaskQueueInterface.php',
+                            'Utils.php'
+                        ];
+                        foreach ($promiseFiles as $file) {
+                            $fullPath = $promisePath . '/' . $file;
+                            if (file_exists($fullPath)) {
+                                require_once $fullPath;
+                            }
+                        }
                     }
-                }
-            }
-            
-            // Load GuzzleHttp PSR7 classes (must load traits before classes that use them)
-            $guzzlePsr7Path = __DIR__ . '/../vendor/guzzlehttp/psr7/src';
-            if (is_dir($guzzlePsr7Path)) {
-                // Load PSR-7 interfaces first
-                $psrMessagePath = __DIR__ . '/../vendor/psr/http-message/src';
-                if (is_dir($psrMessagePath)) {
-                    $psrMessageFiles = glob($psrMessagePath . '/*.php');
-                    foreach ($psrMessageFiles as $file) {
-                        require_once $file;
+                    
+                    // Load GuzzleHttp PSR7 classes (must load traits before classes that use them)
+                    $guzzlePsr7Path = __DIR__ . '/../vendor/guzzlehttp/psr7/src';
+                    if (is_dir($guzzlePsr7Path)) {
+                        // Load PSR-7 interfaces first
+                        $psrMessagePath = __DIR__ . '/../vendor/psr/http-message/src';
+                        if (is_dir($psrMessagePath)) {
+                            $psrMessageFiles = glob($psrMessagePath . '/*.php');
+                            foreach ($psrMessageFiles as $file) {
+                                require_once $file;
+                            }
+                        }
+                        
+                        // Load PSR HTTP Factory interfaces
+                        $psrFactoryPath = __DIR__ . '/../vendor/psr/http-factory/src';
+                        if (is_dir($psrFactoryPath)) {
+                            $psrFactoryFiles = glob($psrFactoryPath . '/*.php');
+                            foreach ($psrFactoryFiles as $file) {
+                                try {
+                                    require_once $file;
+                                } catch (\Throwable $e) {
+                                    error_log("WARNING: Error loading PSR Factory " . basename($file) . ": " . $e->getMessage());
+                                }
+                            }
+                        }
+                        
+                        // Load GuzzleHttp PSR7 files in dependency order
+                        // First, load base classes and traits
+                        $psr7BaseFiles = [
+                            'MessageTrait.php',
+                            'StreamTrait.php',
+                            'StreamDecoratorTrait.php',
+                            'UriNormalizer.php',
+                            'Uri.php',
+                            'Stream.php',
+                            'Message.php',
+                            'Request.php',
+                            'Response.php',
+                            'ServerRequest.php',
+                            'UploadedFile.php',
+                            'UriResolver.php',
+                            'NoSeekStream.php',
+                            'PumpStream.php',
+                            'InflateStream.php',
+                            'LazyOpenStream.php',
+                            'AppendStream.php',
+                            'BufferStream.php',
+                            'CachingStream.php',
+                            'DroppingStream.php',
+                            'FnStream.php',
+                            'LimitStream.php',
+                            'MultipartStream.php',
+                            'Utils.php'
+                        ];
+                        
+                        foreach ($psr7BaseFiles as $file) {
+                            $fullPath = $guzzlePsr7Path . '/' . $file;
+                            if (file_exists($fullPath)) {
+                                try {
+                                    require_once $fullPath;
+                                } catch (\Throwable $e) {
+                                    error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                                }
+                            }
+                        }
+                        
+                        // Then load any remaining files
+                        $allPsr7Files = glob($guzzlePsr7Path . '/*.php');
+                        foreach ($allPsr7Files as $file) {
+                            if (basename($file) !== 'functions_include.php' && !in_array(basename($file), $psr7BaseFiles)) {
+                                try {
+                                    require_once $file;
+                                } catch (\Throwable $e) {
+                                    error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                                }
+                            }
+                        }
                     }
-                }
-                
-                // Load PSR HTTP Factory interfaces
-                $psrFactoryPath = __DIR__ . '/../vendor/psr/http-factory/src';
-                if (is_dir($psrFactoryPath)) {
-                    $psrFactoryFiles = glob($psrFactoryPath . '/*.php');
-                    foreach ($psrFactoryFiles as $file) {
+                    
+                    // Load GuzzleHttp Exception classes
+                    $exceptionPath = $guzzleBasePath . '/Exception';
+                    if (is_dir($exceptionPath)) {
+                        $exceptionFiles = [
+                            'GuzzleException.php',
+                            'TransferException.php',
+                            'RequestException.php',
+                            'BadResponseException.php',
+                            'ClientException.php',
+                            'ServerException.php',
+                            'TooManyRedirectsException.php',
+                            'ConnectException.php'
+                        ];
+                        foreach ($exceptionFiles as $file) {
+                            $fullPath = $exceptionPath . '/' . $file;
+                            if (file_exists($fullPath)) {
+                                require_once $fullPath;
+                            }
+                        }
+                    }
+                    
+                    // Load GuzzleHttp interfaces/contracts first (if they exist)
+                    $guzzleContractPath = $guzzleBasePath . '/Contract';
+                    if (is_dir($guzzleContractPath)) {
+                        $contractFiles = glob($guzzleContractPath . '/**/*.php');
+                        foreach ($contractFiles as $file) {
+                            try {
+                                require_once $file;
+                            } catch (\Throwable $e) {
+                                error_log("WARNING: Error loading GuzzleHttp contract " . basename($file) . ": " . $e->getMessage());
+                            }
+                        }
+                    }
+                    
+                    // Also check for interfaces in the main directory
+                    $guzzleInterfaceFiles = glob($guzzleBasePath . '/*Interface.php');
+                    foreach ($guzzleInterfaceFiles as $file) {
                         try {
                             require_once $file;
                         } catch (\Throwable $e) {
-                            error_log("WARNING: Error loading PSR Factory " . basename($file) . ": " . $e->getMessage());
+                            error_log("WARNING: Error loading GuzzleHttp interface " . basename($file) . ": " . $e->getMessage());
                         }
                     }
-                }
-                
-                // Load GuzzleHttp PSR7 files in dependency order
-                // First, load base classes and traits
-                $psr7BaseFiles = [
-                    'MessageTrait.php',
-                    'StreamTrait.php',
-                    'StreamDecoratorTrait.php',
-                    'UriNormalizer.php',
-                    'Uri.php',
-                    'Stream.php',
-                    'Message.php',
-                    'Request.php',
-                    'Response.php',
-                    'ServerRequest.php',
-                    'UploadedFile.php',
-                    'UriResolver.php',
-                    'NoSeekStream.php',
-                    'PumpStream.php',
-                    'InflateStream.php',
-                    'LazyOpenStream.php',
-                    'AppendStream.php',
-                    'BufferStream.php',
-                    'CachingStream.php',
-                    'DroppingStream.php',
-                    'FnStream.php',
-                    'LimitStream.php',
-                    'MultipartStream.php',
-                    'Utils.php'
-                ];
-                
-                foreach ($psr7BaseFiles as $file) {
-                    $fullPath = $guzzlePsr7Path . '/' . $file;
-                    if (file_exists($fullPath)) {
-                        try {
-                            require_once $fullPath;
-                        } catch (\Throwable $e) {
-                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                    
+                    // Load GuzzleHttp core classes
+                    // Note: Client.php might reference GuzzleHttp\ClientInterface which may not exist
+                    // In GuzzleHttp 7.x, Client implements Psr\Http\Client\ClientInterface directly
+                    $coreFiles = [
+                        'HandlerStack.php',
+                        'RequestOptions.php',
+                        'Utils.php',
+                        'ClientTrait.php'
+                    ];
+                    foreach ($coreFiles as $file) {
+                        $fullPath = $guzzleBasePath . '/' . $file;
+                        if (file_exists($fullPath)) {
+                            try {
+                                require_once $fullPath;
+                            } catch (\Throwable $e) {
+                                error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                            }
                         }
                     }
-                }
-                
-                // Then load any remaining files
-                $allPsr7Files = glob($guzzlePsr7Path . '/*.php');
-                foreach ($allPsr7Files as $file) {
-                    if (basename($file) !== 'functions_include.php' && !in_array(basename($file), $psr7BaseFiles)) {
-                        try {
-                            require_once $file;
-                        } catch (\Throwable $e) {
-                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                    
+                    // Try to load Client.php last - it might fail if ClientInterface doesn't exist
+                    // but that's okay, we'll fall back to other email services
+                    $clientFile = $guzzleBasePath . '/Client.php';
+                    if (file_exists($clientFile)) {
+                        // Check if we have the required PSR interface
+                        if (interface_exists('Psr\Http\Client\ClientInterface', false)) {
+                            try {
+                                require_once $clientFile;
+                                if (class_exists('GuzzleHttp\Client', false)) {
+                                    error_log("GuzzleHttp\Client loaded manually successfully");
+                                }
+                            } catch (\Throwable $e) {
+                                error_log("WARNING: Error loading Client.php: " . $e->getMessage());
+                                error_log("This is expected if GuzzleHttp\ClientInterface doesn't exist");
+                            }
+                        } else {
+                            error_log("WARNING: Psr\Http\Client\ClientInterface not found, skipping Client.php manual load");
                         }
                     }
-                }
-            }
-            
-            // Load GuzzleHttp Exception classes
-            $exceptionPath = $guzzleBasePath . '/Exception';
-            if (is_dir($exceptionPath)) {
-                $exceptionFiles = [
-                    'GuzzleException.php',
-                    'TransferException.php',
-                    'RequestException.php',
-                    'BadResponseException.php',
-                    'ClientException.php',
-                    'ServerException.php',
-                    'TooManyRedirectsException.php',
-                    'ConnectException.php'
-                ];
-                foreach ($exceptionFiles as $file) {
-                    $fullPath = $exceptionPath . '/' . $file;
-                    if (file_exists($fullPath)) {
-                        require_once $fullPath;
-                    }
-                }
-            }
-            
-            // Load GuzzleHttp interfaces/contracts first (if they exist)
-            $guzzleContractPath = $guzzleBasePath . '/Contract';
-            if (is_dir($guzzleContractPath)) {
-                $contractFiles = glob($guzzleContractPath . '/**/*.php');
-                foreach ($contractFiles as $file) {
-                    try {
-                        require_once $file;
-                    } catch (\Throwable $e) {
-                        error_log("WARNING: Error loading GuzzleHttp contract " . basename($file) . ": " . $e->getMessage());
-                    }
-                }
-            }
-            
-            // Also check for interfaces in the main directory
-            $guzzleInterfaceFiles = glob($guzzleBasePath . '/*Interface.php');
-            foreach ($guzzleInterfaceFiles as $file) {
-                try {
-                    require_once $file;
-                } catch (\Throwable $e) {
-                    error_log("WARNING: Error loading GuzzleHttp interface " . basename($file) . ": " . $e->getMessage());
-                }
-            }
-            
-            // Load GuzzleHttp core classes
-            // Note: Client.php might reference GuzzleHttp\ClientInterface which may not exist
-            // In GuzzleHttp 7.x, Client implements Psr\Http\Client\ClientInterface directly
-            $coreFiles = [
-                'HandlerStack.php',
-                'RequestOptions.php',
-                'Utils.php',
-                'ClientTrait.php'
-            ];
-            foreach ($coreFiles as $file) {
-                $fullPath = $guzzleBasePath . '/' . $file;
-                if (file_exists($fullPath)) {
-                    try {
-                        require_once $fullPath;
-                    } catch (\Throwable $e) {
-                        error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
-                    }
-                }
-            }
-            
-            // Try to load Client.php last - it might fail if ClientInterface doesn't exist
-            // but that's okay, we'll fall back to other email services
-            $clientFile = $guzzleBasePath . '/Client.php';
-            if (file_exists($clientFile)) {
-                // Check if we have the required PSR interface
-                if (interface_exists('Psr\Http\Client\ClientInterface', false)) {
-                    try {
-                        require_once $clientFile;
-                        if (class_exists('GuzzleHttp\Client', false)) {
-                            error_log("GuzzleHttp\Client loaded manually successfully");
-                        }
-                    } catch (\Throwable $e) {
-                        error_log("WARNING: Error loading Client.php: " . $e->getMessage());
-                        error_log("This is expected if GuzzleHttp\ClientInterface doesn't exist");
+                    
+                    // Check if it worked
+                    if (class_exists('GuzzleHttp\Client', false)) {
+                        error_log("GuzzleHttp\Client loaded manually successfully");
+                    } else {
+                        error_log("ERROR: GuzzleHttp\Client still not found after manual load");
+                        error_log("GuzzleHttp base path: " . $guzzleBasePath);
+                        error_log("GuzzleHttp base path exists: " . (is_dir($guzzleBasePath) ? "YES" : "NO"));
                     }
                 } else {
-                    error_log("WARNING: Psr\Http\Client\ClientInterface not found, skipping Client.php manual load");
+                    error_log("ERROR: GuzzleHttp package directory not found at: " . $guzzleBasePath);
                 }
-            }
-            
-            // Check if it worked
-            if (class_exists('GuzzleHttp\Client', false)) {
-                error_log("GuzzleHttp\Client loaded manually successfully");
-            } else {
-                error_log("ERROR: GuzzleHttp\Client still not found after manual load");
-                error_log("GuzzleHttp base path: " . $guzzleBasePath);
-                error_log("GuzzleHttp base path exists: " . (is_dir($guzzleBasePath) ? "YES" : "NO"));
-            }
             } catch (\Throwable $e) {
                 error_log("ERROR: Fatal error during manual GuzzleHttp loading: " . $e->getMessage());
                 error_log("ERROR Trace: " . $e->getTraceAsString());
                 error_log("Will fall back to other email services");
             }
-        } else {
-            error_log("ERROR: GuzzleHttp package directory not found at: " . $guzzleBasePath);
         }
     } else {
         error_log("GuzzleHttp\Client found via autoloader");
