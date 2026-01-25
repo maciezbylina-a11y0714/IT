@@ -100,7 +100,7 @@ header('Content-Type: text/html; charset=utf-8');
         $test_body = "<p>This is a test email from Allyson Tech Solutions website.</p>";
         $test_body .= "<p>If you receive this, your email configuration is working correctly!</p>";
         
-        echo "<p class="info">Attempting to send test email...</p>";
+        echo '<p class="info">Attempting to send test email...</p>';
         
         $status = mailfunction($receiver_email, "Allyson Tech Solutions", $test_body);
         

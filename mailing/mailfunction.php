@@ -19,9 +19,21 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
 
     $mail->Host = $GLOBALS['mail_host'];
 
-    $mail->Port = $GLOBALS['mail_port'];
+    $mail->Port = intval($GLOBALS['mail_port']);
 
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    
+    // Additional settings for Railway/cloud environments
+    $mail->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
+    
+    // Set timeout for Railway
+    $mail->Timeout = 30;
 
     $mail->SMTPAuth = true;
 
