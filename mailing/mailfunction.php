@@ -95,23 +95,28 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                 
                 // Resend class is in global namespace, but autoloader may not be finding it
                 // Try to manually require the Resend.php file
-                // The autoloader should handle dependencies when they're needed
+                // First, ensure autoloader is loaded and trigger it for dependencies
                 $resendMainFile = $resendPackagePath . '/src/Resend.php';
                 if (file_exists($resendMainFile)) {
                     error_log("Resend main file exists: " . $resendMainFile);
                     
-                    // Ensure autoloader is registered before requiring Resend.php
-                    // This way, when Resend.php uses Resend\ValueObjects\ApiKey, etc., 
-                    // the autoloader will load them
-                    if (!class_exists('Composer\Autoload\ClassLoader', false)) {
-                        $autoloadPath = __DIR__ . '/../vendor/autoload.php';
-                        if (file_exists($autoloadPath)) {
-                            require_once $autoloadPath;
-                            error_log("Re-loaded autoloader before requiring Resend.php");
-                        }
+                    // Ensure autoloader is registered
+                    $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+                    if (file_exists($autoloadPath)) {
+                        require_once $autoloadPath;
+                        error_log("Autoloader loaded");
                     }
                     
-                    // Now require Resend.php - the autoloader will handle dependencies
+                    // Pre-trigger autoloader for Resend dependencies that will be needed
+                    // This ensures they're loaded before Resend.php tries to use them
+                    spl_autoload_call('Resend\ValueObjects\ApiKey');
+                    spl_autoload_call('Resend\ValueObjects\Transporter\BaseUri');
+                    spl_autoload_call('Resend\ValueObjects\Transporter\Headers');
+                    spl_autoload_call('Resend\Transporters\HttpTransporter');
+                    spl_autoload_call('Resend\Client');
+                    error_log("Pre-loaded Resend dependencies via autoloader");
+                    
+                    // Now require Resend.php - dependencies should already be loaded
                     require_once $resendMainFile;
                     error_log("Manually required Resend.php file");
                     
