@@ -107,14 +107,25 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                         error_log("Autoloader loaded");
                     }
                     
-                    // Pre-trigger autoloader for Resend dependencies that will be needed
-                    // This ensures they're loaded before Resend.php tries to use them
-                    spl_autoload_call('Resend\ValueObjects\ApiKey');
-                    spl_autoload_call('Resend\ValueObjects\Transporter\BaseUri');
-                    spl_autoload_call('Resend\ValueObjects\Transporter\Headers');
-                    spl_autoload_call('Resend\Transporters\HttpTransporter');
-                    spl_autoload_call('Resend\Client');
-                    error_log("Pre-loaded Resend dependencies via autoloader");
+                    // Manually require all Resend dependencies before requiring Resend.php
+                    // The autoloader isn't finding them, so we'll load them directly
+                    $resendSrcPath = $resendPackagePath . '/src';
+                    $dependencyFiles = [
+                        $resendSrcPath . '/ValueObjects/ApiKey.php',
+                        $resendSrcPath . '/ValueObjects/Transporter/BaseUri.php',
+                        $resendSrcPath . '/ValueObjects/Transporter/Headers.php',
+                        $resendSrcPath . '/Transporters/HttpTransporter.php',
+                        $resendSrcPath . '/Client.php',
+                    ];
+                    
+                    foreach ($dependencyFiles as $file) {
+                        if (file_exists($file)) {
+                            require_once $file;
+                            error_log("Loaded: " . basename($file));
+                        } else {
+                            error_log("WARNING: Dependency file not found: " . $file);
+                        }
+                    }
                     
                     // Now require Resend.php - dependencies should already be loaded
                     require_once $resendMainFile;
