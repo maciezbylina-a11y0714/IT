@@ -34,9 +34,10 @@ if (file_exists($autoloadPath)) {
         error_log("WARNING: GuzzleHttp\Client not found via autoloader");
         error_log("Attempting to trigger autoloader for GuzzleHttp dependencies...");
         
-        // Try to trigger autoloader for all required classes in order
+        // Try to trigger autoloader for all required classes in order using class_exists
+        // This is more reliable than spl_autoload_call as it properly handles dependencies
         $classesToLoad = [
-            // PSR interfaces
+            // PSR interfaces (must be loaded first)
             'Psr\Http\Message\MessageInterface',
             'Psr\Http\Message\RequestInterface',
             'Psr\Http\Message\ResponseInterface',
@@ -50,10 +51,12 @@ if (file_exists($autoloadPath)) {
             'Psr\Http\Message\ResponseFactoryInterface',
             'Psr\Http\Message\StreamFactoryInterface',
             'Psr\Http\Message\UriFactoryInterface',
+            'Psr\Http\Message\ServerRequestFactoryInterface',
+            'Psr\Http\Message\UploadedFileFactoryInterface',
             // GuzzleHttp Promise
             'GuzzleHttp\Promise\PromiseInterface',
             'GuzzleHttp\Promise\Promise',
-            // GuzzleHttp PSR7
+            // GuzzleHttp PSR7 (traits and classes)
             'GuzzleHttp\Psr7\MessageTrait',
             'GuzzleHttp\Psr7\StreamTrait',
             'GuzzleHttp\Psr7\StreamDecoratorTrait',
@@ -69,7 +72,8 @@ if (file_exists($autoloadPath)) {
         ];
         
         foreach ($classesToLoad as $className) {
-            spl_autoload_call($className);
+            // Use class_exists with autoload=true to properly trigger the autoloader
+            class_exists($className, true);
         }
         
         // Check if it worked
