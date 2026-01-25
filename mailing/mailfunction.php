@@ -61,10 +61,10 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
+        // Resend class is in Resend\Resend namespace, not global namespace
         // Use autoloader to load Resend class and all its dependencies
-        // The 'true' parameter triggers autoloading which will load all required classes
-        if (!class_exists('Resend', true)) {
-            error_log("ERROR: Resend class not found. Autoloader may not be working.");
+        if (!class_exists('Resend\Resend', true)) {
+            error_log("ERROR: Resend\Resend class not found. Autoloader may not be working.");
             error_log("Vendor directory exists: " . (is_dir(__DIR__ . '/../vendor') ? "YES" : "NO"));
             error_log("Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? "YES" : "NO"));
             
@@ -75,8 +75,8 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                     require_once __DIR__ . '/../vendor/autoload.php';
                     
                     // Try again with autoload
-                    if (!class_exists('Resend', true)) {
-                        error_log("ERROR: Resend class still not found after re-requiring autoloader");
+                    if (!class_exists('Resend\Resend', true)) {
+                        error_log("ERROR: Resend\Resend class still not found after re-requiring autoloader");
                         return false;
                     }
                 } else {
@@ -84,13 +84,14 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                     return false;
                 }
             } else {
+                error_log("ERROR: Autoloader is loaded but Resend\Resend class not found. Package may not be installed.");
                 return false;
             }
         }
         
-        // Instantiate Resend client (class is in global namespace, autoloader handles all dependencies)
+        // Instantiate Resend client (using fully qualified namespace)
         try {
-            $resend = Resend::client($resend_api_key);
+            $resend = \Resend\Resend::client($resend_api_key);
             error_log("Resend: Client initialized successfully");
         } catch (\Exception $e) {
             error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
