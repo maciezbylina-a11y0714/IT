@@ -158,8 +158,18 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                     });
                     
                     // Ensure GuzzleHttp is loaded via autoloader (it's a Composer dependency)
+                    // Trigger autoloader for GuzzleHttp before loading Resend files
                     if (!class_exists('GuzzleHttp\Client', true)) {
-                        error_log("WARNING: GuzzleHttp\Client not found, but should be autoloaded");
+                        error_log("WARNING: GuzzleHttp\Client not found via autoloader");
+                        // Try to manually trigger autoload
+                        spl_autoload_call('GuzzleHttp\Client');
+                        if (!class_exists('GuzzleHttp\Client', false)) {
+                            error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
+                        } else {
+                            error_log("GuzzleHttp\Client loaded via spl_autoload_call");
+                        }
+                    } else {
+                        error_log("GuzzleHttp\Client found via autoloader");
                     }
                     
                     // Load all files
