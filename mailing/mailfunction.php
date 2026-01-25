@@ -20,8 +20,13 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $mail->Host = $GLOBALS['mail_host'];
 
     $mail->Port = intval($GLOBALS['mail_port']);
-
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    
+    // Use SMTPS (SSL) for port 465, STARTTLS for port 587
+    if (intval($GLOBALS['mail_port']) == 465) {
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // SSL
+    } else {
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS
+    }
     
     // Additional settings for Railway/cloud environments
     $mail->SMTPOptions = array(
