@@ -384,57 +384,109 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         // Try to find Resend class - it's in the global namespace
         if (!class_exists('Resend', true)) {
             error_log("ERROR: Resend class not found");
-            error_log("Checking if Resend package exists at: " . __DIR__ . '/../vendor/resend/resend-php');
+            error_log("Attempting to trigger autoloader for Resend...");
             
-            // Try to manually load Resend if autoloader failed
+            // Try to trigger autoloader for Resend and its dependencies
+            $resendClasses = [
+                'Resend\ValueObjects\ApiKey',
+                'Resend\Resource',
+                'Resend\Service\Service',
+                'Resend\Service\Emails',
+                'Resend'
+            ];
+            
+            foreach ($resendClasses as $className) {
+                class_exists($className, true);
+            }
+            
+            // Check if it worked
+            if (class_exists('Resend', false)) {
+                error_log("Resend class loaded via autoloader trigger");
+            } else {
+                error_log("Resend class still not found, attempting manual load...");
+                error_log("Checking if Resend package exists at: " . __DIR__ . '/../vendor/resend/resend-php');
+            
+                // Try to manually load Resend if autoloader failed
             $resendMainFile = __DIR__ . '/../vendor/resend/resend-php/src/Resend.php';
             if (file_exists($resendMainFile)) {
                 // Load Resend dependencies first (ValueObjects, etc.)
                 $resendSrcPath = __DIR__ . '/../vendor/resend/resend-php/src';
                 
-                // Load ValueObjects first (Resend needs ApiKey)
-                $valueObjectsPath = $resendSrcPath . '/ValueObjects';
-                if (is_dir($valueObjectsPath)) {
-                    $valueObjectFiles = glob($valueObjectsPath . '/*.php');
-                    foreach ($valueObjectFiles as $file) {
-                        require_once $file;
+                try {
+                    // Load dependencies first, then Resend.php
+                    // Load ValueObjects first (Resend needs ApiKey)
+                    $valueObjectsPath = $resendSrcPath . '/ValueObjects';
+                    if (is_dir($valueObjectsPath)) {
+                        $valueObjectFiles = glob($valueObjectsPath . '/*.php');
+                        foreach ($valueObjectFiles as $file) {
+                            try {
+                                require_once $file;
+                            } catch (\Throwable $e) {
+                                error_log("WARNING: Error loading Resend ValueObject " . basename($file) . ": " . $e->getMessage());
+                            }
+                        }
                     }
-                }
-                
-                // Load Contracts
-                $contractsPath = $resendSrcPath . '/Contracts';
-                if (is_dir($contractsPath)) {
-                    $contractFiles = glob($contractsPath . '/*.php');
-                    foreach ($contractFiles as $file) {
-                        require_once $file;
+                    
+                    // Load Contracts (skip if they fail - they might not be critical)
+                    $contractsPath = $resendSrcPath . '/Contracts';
+                    if (is_dir($contractsPath)) {
+                        $contractFiles = glob($contractsPath . '/*.php');
+                        foreach ($contractFiles as $file) {
+                            try {
+                                require_once $file;
+                            } catch (\Throwable $e) {
+                                // Skip contracts that fail - they might reference missing interfaces
+                                error_log("WARNING: Skipping Resend contract " . basename($file) . ": " . $e->getMessage());
+                            }
+                        }
                     }
-                }
-                
-                // Load Resource base class
-                $resourceFile = $resendSrcPath . '/Resource.php';
-                if (file_exists($resourceFile)) {
-                    require_once $resourceFile;
-                }
-                
-                // Load Service base class
-                $serviceFile = $resendSrcPath . '/Service/Service.php';
-                if (file_exists($serviceFile)) {
-                    require_once $serviceFile;
-                }
-                
-                // Load Emails service (needed by Resend)
-                $emailsServiceFile = $resendSrcPath . '/Service/Emails.php';
-                if (file_exists($emailsServiceFile)) {
-                    require_once $emailsServiceFile;
-                }
-                
-                // Finally load Resend.php
-                require_once $resendMainFile;
-                
-                if (class_exists('Resend', false)) {
-                    error_log("Resend class loaded manually");
-                } else {
-                    error_log("ERROR: Resend class still not found after manual load");
+                    
+                    // Load Resource base class
+                    $resourceFile = $resendSrcPath . '/Resource.php';
+                    if (file_exists($resourceFile)) {
+                        try {
+                            require_once $resourceFile;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading Resend Resource: " . $e->getMessage());
+                        }
+                    }
+                    
+                    // Load Service base class
+                    $serviceFile = $resendSrcPath . '/Service/Service.php';
+                    if (file_exists($serviceFile)) {
+                        try {
+                            require_once $serviceFile;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading Resend Service: " . $e->getMessage());
+                        }
+                    }
+                    
+                    // Load Emails service (needed by Resend)
+                    $emailsServiceFile = $resendSrcPath . '/Service/Emails.php';
+                    if (file_exists($emailsServiceFile)) {
+                        try {
+                            require_once $emailsServiceFile;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading Resend Emails service: " . $e->getMessage());
+                        }
+                    }
+                    
+                    // Finally load Resend.php after dependencies
+                    try {
+                        require_once $resendMainFile;
+                    } catch (\Throwable $e) {
+                        error_log("ERROR: Failed to load Resend.php even after loading dependencies: " . $e->getMessage());
+                        return false;
+                    }
+                    
+                    if (class_exists('Resend', false)) {
+                        error_log("Resend class loaded manually");
+                    } else {
+                        error_log("ERROR: Resend class still not found after manual load");
+                        return false;
+                    }
+                } catch (\Throwable $e) {
+                    error_log("ERROR: Fatal error during Resend manual loading: " . $e->getMessage());
                     return false;
                 }
             } else {
