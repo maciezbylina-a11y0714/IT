@@ -2,7 +2,6 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use Resend\Resend;
 
 require('./vendor/autoload.php');
 require 'mailingvariables.php';
@@ -55,7 +54,29 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        $resend = Resend::client($resend_api_key);
+        // Check if Resend package is installed and find the correct class
+        if (!class_exists('Resend') && !class_exists('\Resend\Resend') && !class_exists('\Resend\Client')) {
+            error_log("ERROR: Resend PHP package not found! Make sure 'resend/resend-php' is installed via Composer.");
+            error_log("Run: composer require resend/resend-php");
+            return false;
+        }
+        
+        // Try different ways to instantiate Resend client
+        try {
+            if (class_exists('\Resend\Resend')) {
+                $resend = \Resend\Resend::client($resend_api_key);
+            } elseif (class_exists('Resend')) {
+                $resend = Resend::client($resend_api_key);
+            } elseif (class_exists('\Resend\Client')) {
+                $resend = new \Resend\Client($resend_api_key);
+            } else {
+                error_log("ERROR: Could not find Resend class. Package may not be installed correctly.");
+                return false;
+            }
+        } catch (\Exception $e) {
+            error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
+            return false;
+        }
         
         $params = [
             'from' => $sender_name . ' <' . $sender_email . '>',
