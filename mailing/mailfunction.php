@@ -7,26 +7,93 @@ use PHPMailer\PHPMailer\SMTP;
 $autoloadPath = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoloadPath)) {
     require_once $autoloadPath;
-    // Verify autoloader loaded correctly
-    if (!function_exists('spl_autoload_functions') || count(spl_autoload_functions()) == 0) {
-        error_log("WARNING: No autoloaders registered after requiring autoload.php");
+    
+    // Verify autoloader is working by checking if it can find a known class
+    if (!class_exists('PHPMailer\PHPMailer\PHPMailer', true)) {
+        error_log("ERROR: Autoloader loaded but PHPMailer not found - autoloader may not be working");
+        error_log("Autoloader path: " . $autoloadPath);
+        error_log("Autoloader file exists: " . (file_exists($autoloadPath) ? "YES" : "NO"));
+        error_log("Registered autoloaders: " . (function_exists('spl_autoload_functions') ? count(spl_autoload_functions()) : "N/A"));
+        
+        // Check if autoloader files exist
+        $autoloadFilesPath = __DIR__ . '/../vendor/composer';
+        if (is_dir($autoloadFilesPath)) {
+            error_log("Composer autoload files directory exists: YES");
+            error_log("autoload_classmap.php exists: " . (file_exists($autoloadFilesPath . '/autoload_classmap.php') ? "YES" : "NO"));
+            error_log("autoload_psr4.php exists: " . (file_exists($autoloadFilesPath . '/autoload_psr4.php') ? "YES" : "NO"));
+        } else {
+            error_log("ERROR: Composer autoload files directory does not exist at: " . $autoloadFilesPath);
+        }
+    } else {
+        error_log("Autoloader verified: PHPMailer found successfully");
+    }
+    
+    // Ensure GuzzleHttp is available (required by Resend)
+    // GuzzleHttp should be autoloaded by Composer, but if it's not working,
+    // we'll try to trigger the autoloader explicitly
+    if (!class_exists('GuzzleHttp\Client', true)) {
+        error_log("WARNING: GuzzleHttp\Client not found via autoloader");
+        error_log("Attempting to trigger autoloader for GuzzleHttp dependencies...");
+        
+        // Try to trigger autoloader for GuzzleHttp and its dependencies
+        $guzzleClasses = [
+            'GuzzleHttp\Promise\PromiseInterface',
+            'GuzzleHttp\Promise\Promise',
+            'GuzzleHttp\Exception\GuzzleException',
+            'GuzzleHttp\Exception\RequestException',
+            'GuzzleHttp\HandlerStack',
+            'GuzzleHttp\Client'
+        ];
+        
+        foreach ($guzzleClasses as $className) {
+            spl_autoload_call($className);
+        }
+        
+        // Check again
+        if (class_exists('GuzzleHttp\Client', false)) {
+            error_log("GuzzleHttp\Client loaded via autoloader trigger");
+        } else {
+            error_log("ERROR: GuzzleHttp\Client still not found - autoloader may not be properly configured");
+            error_log("This may indicate a problem with Composer's autoloader generation");
+            
+            // Last resort: try to manually load GuzzleHttp Client
+            // This is a workaround if the autoloader isn't working
+            $guzzleClientPath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src/Client.php';
+            if (file_exists($guzzleClientPath)) {
+                error_log("Attempting to manually require GuzzleHttp Client...");
+                // Load required dependencies first
+                $guzzleBase = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
+                $requiredFiles = [
+                    'Promise/PromiseInterface.php',
+                    'Promise/Promise.php',
+                    'Exception/GuzzleException.php',
+                    'HandlerStack.php',
+                    'RequestOptions.php',
+                    'Client.php'
+                ];
+                
+                foreach ($requiredFiles as $file) {
+                    $fullPath = $guzzleBase . '/' . $file;
+                    if (file_exists($fullPath)) {
+                        try {
+                            require_once $fullPath;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                        }
+                    }
+                }
+                
+                if (class_exists('GuzzleHttp\Client', false)) {
+                    error_log("GuzzleHttp\Client loaded manually as fallback");
+                }
+            }
+        }
     }
 } else {
     // Fallback to relative path
     require('./vendor/autoload.php');
 }
 require 'mailingvariables.php';
-
-// Try to load Resend class - check multiple possible class names
-if (class_exists('Resend', true)) {
-    // Global namespace Resend
-} elseif (class_exists('Resend\Resend', true)) {
-    // Namespaced Resend\Resend
-    class_alias('Resend\Resend', 'Resend');
-} elseif (class_exists('Resend\Client', true)) {
-    // Alternative namespace
-    class_alias('Resend\Client', 'Resend');
-}
 
 function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false){
     
@@ -76,175 +143,80 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        // Try multiple class names - Resend package may use different class structure
-        $resendClass = null;
-        if (class_exists('Resend', true)) {
-            $resendClass = 'Resend';
-            error_log("Resend: Found class 'Resend' in global namespace");
-        } elseif (class_exists('Resend\Resend', true)) {
-            $resendClass = 'Resend\Resend';
-            error_log("Resend: Found class 'Resend\Resend'");
-        } elseif (class_exists('Resend\Client', true)) {
-            $resendClass = 'Resend\Client';
-            error_log("Resend: Found class 'Resend\Client'");
-        } else {
-            error_log("ERROR: Resend class not found in any namespace. Checking autoloader...");
-            error_log("Vendor directory exists: " . (is_dir(__DIR__ . '/../vendor') ? "YES" : "NO"));
-            error_log("Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? "YES" : "NO"));
+        // Ensure GuzzleHttp is available before trying to use Resend
+        if (!class_exists('GuzzleHttp\Client', true)) {
+            error_log("ERROR: GuzzleHttp\Client not found - cannot use Resend without it");
+            error_log("Falling back to other email services...");
+            // Return false to trigger fallback to Mailgun/SendGrid/SMTP
+            return false;
+        }
+        
+        // Try to find Resend class - it's in the global namespace
+        if (!class_exists('Resend', true)) {
+            error_log("ERROR: Resend class not found");
+            error_log("Checking if Resend package exists at: " . __DIR__ . '/../vendor/resend/resend-php');
             
-            // Check if Resend package directory exists
-            $resendPackagePath = __DIR__ . '/../vendor/resend/resend-php';
-            if (is_dir($resendPackagePath)) {
-                error_log("Resend package directory exists: YES");
+            // Try to manually load Resend if autoloader failed
+            $resendMainFile = __DIR__ . '/../vendor/resend/resend-php/src/Resend.php';
+            if (file_exists($resendMainFile)) {
+                // Load Resend dependencies first (ValueObjects, etc.)
+                $resendSrcPath = __DIR__ . '/../vendor/resend/resend-php/src';
                 
-                // Resend class is in global namespace, but autoloader may not be finding it
-                // Try to manually require the Resend.php file
-                // First, ensure autoloader is loaded and trigger it for dependencies
-                $resendMainFile = $resendPackagePath . '/src/Resend.php';
-                if (file_exists($resendMainFile)) {
-                    error_log("Resend main file exists: " . $resendMainFile);
-                    
-                    // Ensure autoloader is registered
-                    $autoloadPath = __DIR__ . '/../vendor/autoload.php';
-                    if (file_exists($autoloadPath)) {
-                        require_once $autoloadPath;
-                        error_log("Autoloader loaded");
+                // Load ValueObjects first (Resend needs ApiKey)
+                $valueObjectsPath = $resendSrcPath . '/ValueObjects';
+                if (is_dir($valueObjectsPath)) {
+                    $valueObjectFiles = glob($valueObjectsPath . '/*.php');
+                    foreach ($valueObjectFiles as $file) {
+                        require_once $file;
                     }
-                    
-                    // Recursively require all PHP files in Resend src directory
-                    // Load in proper dependency order: base classes first, then dependent ones
-                    $resendSrcPath = $resendPackagePath . '/src';
-                    $filesToLoad = [];
-                    
-                    // Recursively find all PHP files
-                    $iterator = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($resendSrcPath, RecursiveDirectoryIterator::SKIP_DOTS),
-                        RecursiveIteratorIterator::SELF_FIRST
-                    );
-                    
-                    foreach ($iterator as $file) {
-                        if ($file->isFile() && $file->getExtension() === 'php') {
-                            $filesToLoad[] = $file->getPathname();
-                        }
+                }
+                
+                // Load Contracts
+                $contractsPath = $resendSrcPath . '/Contracts';
+                if (is_dir($contractsPath)) {
+                    $contractFiles = glob($contractsPath . '/*.php');
+                    foreach ($contractFiles as $file) {
+                        require_once $file;
                     }
-                    
-                    // Sort files to load in dependency order:
-                    // 1. Contracts (interfaces) first
-                    // 2. Resource.php (base class)
-                    // 3. Service.php (base service)
-                    // 4. ValueObjects
-                    // 5. Transporters
-                    // 6. Everything else
-                    // 7. Resend.php last
-                    usort($filesToLoad, function($a, $b) {
-                        $aPath = str_replace('\\', '/', $a);
-                        $bPath = str_replace('\\', '/', $b);
-                        
-                        // Resend.php always last
-                        if (strpos($aPath, '/Resend.php') !== false) return 1;
-                        if (strpos($bPath, '/Resend.php') !== false) return -1;
-                        
-                        // Contracts first
-                        $aIsContract = strpos($aPath, '/Contracts/') !== false;
-                        $bIsContract = strpos($bPath, '/Contracts/') !== false;
-                        if ($aIsContract && !$bIsContract) return -1;
-                        if (!$aIsContract && $bIsContract) return 1;
-                        
-                        // Resource.php before other files
-                        if (strpos($aPath, '/Resource.php') !== false) return -1;
-                        if (strpos($bPath, '/Resource.php') !== false) return 1;
-                        
-                        // Service.php before files that use it
-                        if (strpos($aPath, '/Service/Service.php') !== false) return -1;
-                        if (strpos($bPath, '/Service/Service.php') !== false) return 1;
-                        
-                        return strcmp($aPath, $bPath);
-                    });
-                    
-                    // GuzzleHttp should be autoloaded by Composer when needed
-                    // GuzzleHttp uses PSR-4 autoloading, so the autoloader should handle it
-                    // But let's verify the autoloader can find it
-                    if (!class_exists('GuzzleHttp\Client', true)) {
-                        error_log("WARNING: GuzzleHttp\Client not found via autoloader");
-                        // Check if GuzzleHttp package exists
-                        $guzzlePath = __DIR__ . '/../vendor/guzzlehttp/guzzle';
-                        if (is_dir($guzzlePath)) {
-                            error_log("GuzzleHttp package exists at: " . $guzzlePath);
-                            // Try to manually trigger autoloader - it should work
-                            spl_autoload_call('GuzzleHttp\Client');
-                            if (class_exists('GuzzleHttp\Client', false)) {
-                                error_log("GuzzleHttp\Client loaded via spl_autoload_call");
-                            } else {
-                                error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
-                                error_log("This may indicate the autoloader is not properly configured for GuzzleHttp");
-                            }
-                        } else {
-                            error_log("ERROR: GuzzleHttp package not found at: " . $guzzlePath);
-                        }
-                    } else {
-                        error_log("GuzzleHttp\Client found via autoloader");
-                    }
-                    
-                    // Load all files
-                    foreach ($filesToLoad as $file) {
-                        try {
-                            require_once $file;
-                        } catch (\Throwable $e) {
-                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
-                        }
-                    }
-                    error_log("Loaded " . count($filesToLoad) . " Resend PHP files");
-                    
-                    // Verify the class exists
-                    if (class_exists('Resend', false)) {
-                        $resendClass = 'Resend';
-                        error_log("Resend class found after manual require");
-                    } else {
-                        error_log("ERROR: Resend class still not found after manual require");
-                    }
+                }
+                
+                // Load Resource base class
+                $resourceFile = $resendSrcPath . '/Resource.php';
+                if (file_exists($resourceFile)) {
+                    require_once $resourceFile;
+                }
+                
+                // Load Service base class
+                $serviceFile = $resendSrcPath . '/Service/Service.php';
+                if (file_exists($serviceFile)) {
+                    require_once $serviceFile;
+                }
+                
+                // Load Emails service (needed by Resend)
+                $emailsServiceFile = $resendSrcPath . '/Service/Emails.php';
+                if (file_exists($emailsServiceFile)) {
+                    require_once $emailsServiceFile;
+                }
+                
+                // Finally load Resend.php
+                require_once $resendMainFile;
+                
+                if (class_exists('Resend', false)) {
+                    error_log("Resend class loaded manually");
                 } else {
-                    error_log("Resend main file not found at: " . $resendMainFile);
+                    error_log("ERROR: Resend class still not found after manual load");
+                    return false;
                 }
             } else {
-                error_log("Resend package directory does not exist at: " . $resendPackagePath);
-            }
-            
-            if (!$resendClass) {
-                error_log("ERROR: Could not find Resend class after all attempts");
+                error_log("ERROR: Resend main file not found at: " . $resendMainFile);
                 return false;
             }
         }
         
-        // Instantiate Resend client
-        // The autoloader should handle GuzzleHttp\Client when Resend::client() uses it
-        // But if it's not working, we need to ensure the autoloader is properly set up
+        // Now instantiate Resend client
         try {
-            // Verify autoloader is working by checking a known class
-            if (!class_exists('PHPMailer\PHPMailer\PHPMailer', false)) {
-                error_log("WARNING: PHPMailer not found - autoloader may not be working");
-            } else {
-                error_log("Autoloader is working (PHPMailer found)");
-            }
-            
-            // Try to ensure GuzzleHttp is available
-            // The autoloader should handle this automatically when Resend uses it
-            if (!class_exists('GuzzleHttp\Client', true)) {
-                error_log("WARNING: GuzzleHttp\Client not found via autoloader");
-                // Try triggering autoloader - it should work if autoloader is properly set up
-                spl_autoload_call('GuzzleHttp\Client');
-                if (class_exists('GuzzleHttp\Client', false)) {
-                    error_log("GuzzleHttp\Client loaded via spl_autoload_call");
-                } else {
-                    error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
-                    error_log("This suggests the autoloader may not be properly configured for GuzzleHttp");
-                }
-            } else {
-                error_log("GuzzleHttp\Client found via autoloader");
-            }
-            
-            // Now try to use Resend - the autoloader should handle GuzzleHttp when Resend needs it
-            $resend = $resendClass::client($resend_api_key);
-            error_log("Resend: Client initialized successfully using class: " . $resendClass);
+            $resend = Resend::client($resend_api_key);
+            error_log("Resend: Client initialized successfully");
         } catch (\Exception $e) {
             error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
             error_log("ERROR Trace: " . $e->getTraceAsString());
