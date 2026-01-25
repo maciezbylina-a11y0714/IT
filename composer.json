@@ -12,6 +12,8 @@
     ],
     "require": {
         "phpmailer/phpmailer": "^6.5",
-        "sendgrid/sendgrid": "^8.0"
+        "sendgrid/sendgrid": "^8.0",
+        "resend/resend-php": "^2.0",
+        "mailgun/mailgun-php": "^3.5"
     }
 }

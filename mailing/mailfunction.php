@@ -8,15 +8,109 @@ require 'mailingvariables.php';
 
 function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false){
     
-    // Try SendGrid API first (recommended for Railway)
-    $sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: "";
+    // Try email services in priority order (all work on Railway via HTTP API)
     
+    // 1. Resend (Recommended - easiest, great free tier)
+    $resend_api_key = getenv('RESEND_API_KEY') ?: "";
+    if (!empty($resend_api_key)) {
+        return sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+    }
+    
+    // 2. Mailgun (Industry standard, excellent deliverability)
+    $mailgun_api_key = getenv('MAILGUN_API_KEY') ?: "";
+    $mailgun_domain = getenv('MAILGUN_DOMAIN') ?: "";
+    if (!empty($mailgun_api_key) && !empty($mailgun_domain)) {
+        return sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+    }
+    
+    // 3. SendGrid (Good balance)
+    $sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: "";
     if (!empty($sendgrid_api_key)) {
         return sendEmailViaSendGrid($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
     }
     
-    // Fallback to SMTP (may not work on Railway due to blocked ports)
+    // 4. Fallback to SMTP (may not work on Railway due to blocked ports)
     return sendEmailViaSMTP($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+}
+
+function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false) {
+    try {
+        $resend_api_key = getenv('RESEND_API_KEY');
+        $sender_email = getenv('MAIL_USERNAME') ?: $GLOBALS['mail_sender_email'];
+        $sender_name = getenv('MAIL_FROM_NAME') ?: $GLOBALS['mail_sender_name'];
+        
+        $resend = \Resend::client($resend_api_key);
+        
+        $params = [
+            'from' => $sender_name . ' <' . $sender_email . '>',
+            'to' => [$mail_reciever_email],
+            'subject' => 'Someone Contacted You!',
+            'html' => $mail_msg,
+            'text' => strip_tags($mail_msg),
+        ];
+        
+        if ($attachment !== false && file_exists($attachment)) {
+            $file_content = file_get_contents($attachment);
+            $file_encoded = base64_encode($file_content);
+            $params['attachments'] = [
+                [
+                    'filename' => basename($attachment),
+                    'content' => $file_encoded,
+                ]
+            ];
+        }
+        
+        $result = $resend->emails->send($params);
+        
+        if (isset($result->id)) {
+            error_log("Resend: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $result->id . ")");
+            return true;
+        } else {
+            error_log("Resend Error: " . json_encode($result));
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("Resend Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
+function sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false) {
+    try {
+        $mailgun_api_key = getenv('MAILGUN_API_KEY');
+        $mailgun_domain = getenv('MAILGUN_DOMAIN');
+        $sender_email = getenv('MAIL_USERNAME') ?: $GLOBALS['mail_sender_email'];
+        $sender_name = getenv('MAIL_FROM_NAME') ?: $GLOBALS['mail_sender_name'];
+        
+        $mg = \Mailgun\Mailgun::create($mailgun_api_key);
+        
+        $params = [
+            'from' => $sender_name . ' <' . $sender_email . '>',
+            'to' => $mail_reciever_email,
+            'subject' => 'Someone Contacted You!',
+            'html' => $mail_msg,
+            'text' => strip_tags($mail_msg),
+        ];
+        
+        if ($attachment !== false && file_exists($attachment)) {
+            $params['attachment'] = [
+                ['filePath' => $attachment, 'filename' => basename($attachment)]
+            ];
+        }
+        
+        $result = $mg->messages()->send($mailgun_domain, $params);
+        
+        if (isset($result->getId())) {
+            error_log("Mailgun: Email sent successfully to: " . $mail_reciever_email . " (ID: " . $result->getId() . ")");
+            return true;
+        } else {
+            error_log("Mailgun Error: " . json_encode($result));
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("Mailgun Exception: " . $e->getMessage());
+        return false;
+    }
 }
 
 function sendEmailViaSendGrid($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false) {

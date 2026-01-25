@@ -17,15 +17,23 @@
         exit;
     }
     
-    // Check if SendGrid API key is configured (preferred) or SMTP credentials
+    // Check if any email service is configured (Resend, Mailgun, SendGrid, or SMTP)
+    $resend_api_key = getenv('RESEND_API_KEY') ?: "";
+    $mailgun_api_key = getenv('MAILGUN_API_KEY') ?: "";
+    $mailgun_domain = getenv('MAILGUN_DOMAIN') ?: "";
     $sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: "";
     $mail_username = getenv('MAIL_USERNAME') ?: "";
     $mail_password = getenv('MAIL_PASSWORD') ?: "";
     
-    // SendGrid is preferred, but SMTP can be used as fallback
-    if (empty($sendgrid_api_key) && (empty($mail_username) || empty($mail_password))) {
-        error_log("ERROR: Either SENDGRID_API_KEY or MAIL_USERNAME/MAIL_PASSWORD must be set in Railway!");
-        echo '<center><h1 style="color: red;">Configuration Error: Email service not configured. Please set SENDGRID_API_KEY (recommended) or MAIL_USERNAME/MAIL_PASSWORD in Railway Variables.</h1></center>';
+    // At least one email service must be configured
+    $hasEmailService = (!empty($resend_api_key)) || 
+                       (!empty($mailgun_api_key) && !empty($mailgun_domain)) ||
+                       (!empty($sendgrid_api_key)) ||
+                       (!empty($mail_username) && !empty($mail_password));
+    
+    if (!$hasEmailService) {
+        error_log("ERROR: No email service configured! Set RESEND_API_KEY, MAILGUN_API_KEY+MAILGUN_DOMAIN, SENDGRID_API_KEY, or MAIL_USERNAME/MAIL_PASSWORD in Railway Variables.");
+        echo '<center><h1 style="color: red;">Configuration Error: Email service not configured. Please set RESEND_API_KEY (recommended), MAILGUN_API_KEY+MAILGUN_DOMAIN, SENDGRID_API_KEY, or MAIL_USERNAME/MAIL_PASSWORD in Railway Variables.</h1></center>';
         exit;
     }
     
