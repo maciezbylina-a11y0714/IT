@@ -94,18 +94,28 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                 error_log("Resend package directory exists: YES");
                 
                 // Resend class is in global namespace, but autoloader may not be finding it
-                // Try to manually require the Resend.php file and ensure autoloader loads dependencies
+                // Try to manually require the Resend.php file
+                // The autoloader should handle dependencies when they're needed
                 $resendMainFile = $resendPackagePath . '/src/Resend.php';
                 if (file_exists($resendMainFile)) {
                     error_log("Resend main file exists: " . $resendMainFile);
                     
-                    // First, ensure autoloader is loaded for dependencies
-                    // Resend uses Resend\Client, Resend\ValueObjects\ApiKey, etc.
-                    // These should be autoloaded when we require Resend.php
+                    // Ensure autoloader is registered before requiring Resend.php
+                    // This way, when Resend.php uses Resend\ValueObjects\ApiKey, etc., 
+                    // the autoloader will load them
+                    if (!class_exists('Composer\Autoload\ClassLoader', false)) {
+                        $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+                        if (file_exists($autoloadPath)) {
+                            require_once $autoloadPath;
+                            error_log("Re-loaded autoloader before requiring Resend.php");
+                        }
+                    }
+                    
+                    // Now require Resend.php - the autoloader will handle dependencies
                     require_once $resendMainFile;
                     error_log("Manually required Resend.php file");
                     
-                    // Now check if the class exists
+                    // Verify the class exists
                     if (class_exists('Resend', false)) {
                         $resendClass = 'Resend';
                         error_log("Resend class found after manual require");
