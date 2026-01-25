@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "=== Uploading to GitHub via API ===" -ForegroundColor Green
 
-$token = "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"
+$token = "YOUR_GITHUB_TOKEN"  # Replace with your actual GitHub Personal Access Token
 $repo = "maciezbylina-a11y0714/IT"
 $baseUrl = "https://api.github.com/repos/$repo"
 

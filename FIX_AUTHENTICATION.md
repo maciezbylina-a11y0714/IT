@@ -65,7 +65,7 @@ If GitHub Desktop continues to have issues, you can push via command line:
 cd C:\Users\aaa\AppData\Local\Temp\it-clone
 
 # Set the remote with token
-git remote set-url origin https://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@github.com/maciezbylina-a11y0714/IT.git
+git remote set-url origin https://YOUR_GITHUB_TOKEN@github.com/maciezbylina-a11y0714/IT.git
 
 # Try pushing
 git push -u origin main

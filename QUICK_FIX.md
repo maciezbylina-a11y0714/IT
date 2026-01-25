@@ -58,7 +58,7 @@ The token is already in the URL, so this should work.
 
 ## Verify Your Token is Valid
 
-Your token: `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`
+Your token: `YOUR_GITHUB_TOKEN` (replace with your actual token)
 
 If this token is expired or invalid:
 1. Go to: https://github.com/settings/tokens
