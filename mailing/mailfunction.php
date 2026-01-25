@@ -165,6 +165,17 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
                         spl_autoload_call('GuzzleHttp\Client');
                         if (!class_exists('GuzzleHttp\Client', false)) {
                             error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
+                            // Try to manually require GuzzleHttp Client file
+                            $guzzleClientFile = __DIR__ . '/../vendor/guzzlehttp/guzzle/src/Client.php';
+                            if (file_exists($guzzleClientFile)) {
+                                require_once $guzzleClientFile;
+                                error_log("Manually required GuzzleHttp\Client.php");
+                                if (class_exists('GuzzleHttp\Client', false)) {
+                                    error_log("GuzzleHttp\Client loaded via manual require");
+                                }
+                            } else {
+                                error_log("ERROR: GuzzleHttp Client.php not found at: " . $guzzleClientFile);
+                            }
                         } else {
                             error_log("GuzzleHttp\Client loaded via spl_autoload_call");
                         }
