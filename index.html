@@ -293,7 +293,7 @@
     <div class="contact-form">
         <form action="./contactme.php" method="POST">
             <input type="text" name="name" placeholder="Name" class="contact-form-txt" required>
-            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required placeholder="Contact number" maxlength="10" class="contact-form-phone">
+            <input type="tel" id="phone" name="phone" pattern="\+55\s\d{2}\s\d{5}\s\d{4}" required placeholder="+55 99 98158 6912" maxlength="17" class="contact-form-phone">
             <input type="email" name="email" placeholder="Email" class="contact-form-email" required>
             <textarea placeholder="Your Message" name="message" class="contact-form-txtarea" required></textarea>
             <input type="submit" value="Submit" name="submit" class="contact-form-btn">
