@@ -48,7 +48,7 @@
         <div class="career-form">
             <form action="./careers.php" method="POST" enctype="multipart/form-data">
                 <input type="text" name="name" placeholder="Name" class="career-form-txt" required>
-                <input type="tel" id="phone" name="phone" pattern="\+55\s\d{2}\s\d{5}\s\d{4}" required placeholder="+55 99 98158 6912" maxlength="17" class="career-form-phone">
+                <input type="tel" id="phone" name="phone" pattern="\+55[\s-]?\d{2}[\s-]?\d{4,5}[\s-]?\d{4}" required placeholder="+55 99 98158 6912" maxlength="20" class="career-form-phone" title="Brazilian format: +55 99 98158 6912 (spaces optional)">
                 <input type="email" name="email" placeholder="Email" class="career-form-email" required>
                 <div class="radio-class">
                     <h2 class="name">Apply For Which Post?</h2>
