@@ -13,6 +13,17 @@ if (file_exists($autoloadPath)) {
 }
 require 'mailingvariables.php';
 
+// Try to load Resend class - check multiple possible class names
+if (class_exists('Resend', true)) {
+    // Global namespace Resend
+} elseif (class_exists('Resend\Resend', true)) {
+    // Namespaced Resend\Resend
+    class_alias('Resend\Resend', 'Resend');
+} elseif (class_exists('Resend\Client', true)) {
+    // Alternative namespace
+    class_alias('Resend\Client', 'Resend');
+}
+
 function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment = false){
     
     // Try email services in priority order (all work on Railway via HTTP API)
@@ -61,38 +72,54 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        // Resend class is in Resend\Resend namespace, not global namespace
-        // Use autoloader to load Resend class and all its dependencies
-        if (!class_exists('Resend\Resend', true)) {
-            error_log("ERROR: Resend\Resend class not found. Autoloader may not be working.");
+        // Try multiple class names - Resend package may use different class structure
+        $resendClass = null;
+        if (class_exists('Resend', true)) {
+            $resendClass = 'Resend';
+            error_log("Resend: Found class 'Resend' in global namespace");
+        } elseif (class_exists('Resend\Resend', true)) {
+            $resendClass = 'Resend\Resend';
+            error_log("Resend: Found class 'Resend\Resend'");
+        } elseif (class_exists('Resend\Client', true)) {
+            $resendClass = 'Resend\Client';
+            error_log("Resend: Found class 'Resend\Client'");
+        } else {
+            error_log("ERROR: Resend class not found in any namespace. Checking autoloader...");
             error_log("Vendor directory exists: " . (is_dir(__DIR__ . '/../vendor') ? "YES" : "NO"));
             error_log("Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? "YES" : "NO"));
             
-            // Check if vendor/autoload.php was loaded
-            if (!class_exists('Composer\Autoload\ClassLoader', false)) {
-                error_log("ERROR: Composer autoloader not loaded. Re-requiring vendor/autoload.php");
-                if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-                    require_once __DIR__ . '/../vendor/autoload.php';
-                    
-                    // Try again with autoload
-                    if (!class_exists('Resend\Resend', true)) {
-                        error_log("ERROR: Resend\Resend class still not found after re-requiring autoloader");
-                        return false;
+            // Check if Resend package directory exists
+            $resendPackagePath = __DIR__ . '/../vendor/resend/resend-php';
+            if (is_dir($resendPackagePath)) {
+                error_log("Resend package directory exists: YES");
+                // Try to manually require the main file
+                $resendMainFile = $resendPackagePath . '/src/Resend.php';
+                if (file_exists($resendMainFile)) {
+                    error_log("Resend main file exists: " . $resendMainFile);
+                    require_once $resendMainFile;
+                    // Try again
+                    if (class_exists('Resend', true)) {
+                        $resendClass = 'Resend';
+                    } elseif (class_exists('Resend\Resend', true)) {
+                        $resendClass = 'Resend\Resend';
                     }
                 } else {
-                    error_log("ERROR: vendor/autoload.php not found!");
-                    return false;
+                    error_log("Resend main file not found at: " . $resendMainFile);
                 }
             } else {
-                error_log("ERROR: Autoloader is loaded but Resend\Resend class not found. Package may not be installed.");
+                error_log("Resend package directory does not exist at: " . $resendPackagePath);
+            }
+            
+            if (!$resendClass) {
+                error_log("ERROR: Could not find Resend class after all attempts");
                 return false;
             }
         }
         
-        // Instantiate Resend client (using fully qualified namespace)
+        // Instantiate Resend client
         try {
-            $resend = \Resend\Resend::client($resend_api_key);
-            error_log("Resend: Client initialized successfully");
+            $resend = $resendClass::client($resend_api_key);
+            error_log("Resend: Client initialized successfully using class: " . $resendClass);
         } catch (\Exception $e) {
             error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
             error_log("ERROR Trace: " . $e->getTraceAsString());
