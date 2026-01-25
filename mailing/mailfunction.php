@@ -55,38 +55,7 @@ if (file_exists($autoloadPath)) {
         } else {
             error_log("ERROR: GuzzleHttp\Client still not found - autoloader may not be properly configured");
             error_log("This may indicate a problem with Composer's autoloader generation");
-            
-            // Last resort: try to manually load GuzzleHttp Client
-            // This is a workaround if the autoloader isn't working
-            $guzzleClientPath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src/Client.php';
-            if (file_exists($guzzleClientPath)) {
-                error_log("Attempting to manually require GuzzleHttp Client...");
-                // Load required dependencies first
-                $guzzleBase = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
-                $requiredFiles = [
-                    'Promise/PromiseInterface.php',
-                    'Promise/Promise.php',
-                    'Exception/GuzzleException.php',
-                    'HandlerStack.php',
-                    'RequestOptions.php',
-                    'Client.php'
-                ];
-                
-                foreach ($requiredFiles as $file) {
-                    $fullPath = $guzzleBase . '/' . $file;
-                    if (file_exists($fullPath)) {
-                        try {
-                            require_once $fullPath;
-                        } catch (\Throwable $e) {
-                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
-                        }
-                    }
-                }
-                
-                if (class_exists('GuzzleHttp\Client', false)) {
-                    error_log("GuzzleHttp\Client loaded manually as fallback");
-                }
-            }
+            error_log("Resend will not work - will fall back to other email services");
         }
     }
 } else {
@@ -214,9 +183,15 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         }
         
         // Now instantiate Resend client
+        // This may fail if GuzzleHttp dependencies aren't properly loaded
         try {
             $resend = Resend::client($resend_api_key);
             error_log("Resend: Client initialized successfully");
+        } catch (\Error $e) {
+            // Catch fatal errors (like missing classes/traits)
+            error_log("ERROR: Failed to initialize Resend client (Fatal Error): " . $e->getMessage());
+            error_log("ERROR: This is likely due to missing GuzzleHttp dependencies. Falling back to other email services.");
+            return false;
         } catch (\Exception $e) {
             error_log("ERROR: Failed to initialize Resend client: " . $e->getMessage());
             error_log("ERROR Trace: " . $e->getTraceAsString());
