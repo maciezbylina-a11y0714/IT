@@ -76,7 +76,7 @@ if (file_exists($autoloadPath)) {
                 }
             }
             
-            // Load GuzzleHttp PSR7 classes
+            // Load GuzzleHttp PSR7 classes (must load traits before classes that use them)
             $guzzlePsr7Path = __DIR__ . '/../vendor/guzzlehttp/psr7/src';
             if (is_dir($guzzlePsr7Path)) {
                 // Load PSR-7 interfaces first
@@ -88,11 +88,55 @@ if (file_exists($autoloadPath)) {
                     }
                 }
                 
-                // Then load GuzzleHttp PSR7 implementations
-                $psr7Files = glob($guzzlePsr7Path . '/*.php');
-                foreach ($psr7Files as $file) {
-                    if (basename($file) !== 'functions_include.php') {
-                        require_once $file;
+                // Load GuzzleHttp PSR7 files in dependency order
+                // First, load base classes and traits
+                $psr7BaseFiles = [
+                    'MessageTrait.php',
+                    'StreamTrait.php',
+                    'StreamDecoratorTrait.php',
+                    'UriNormalizer.php',
+                    'Uri.php',
+                    'Stream.php',
+                    'Message.php',
+                    'Request.php',
+                    'Response.php',
+                    'ServerRequest.php',
+                    'UploadedFile.php',
+                    'UriResolver.php',
+                    'NoSeekStream.php',
+                    'PumpStream.php',
+                    'InflateStream.php',
+                    'LazyOpenStream.php',
+                    'AppendStream.php',
+                    'BufferStream.php',
+                    'CachingStream.php',
+                    'DroppingStream.php',
+                    'FnStream.php',
+                    'LimitStream.php',
+                    'MultipartStream.php',
+                    'Utils.php'
+                ];
+                
+                foreach ($psr7BaseFiles as $file) {
+                    $fullPath = $guzzlePsr7Path . '/' . $file;
+                    if (file_exists($fullPath)) {
+                        try {
+                            require_once $fullPath;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                        }
+                    }
+                }
+                
+                // Then load any remaining files
+                $allPsr7Files = glob($guzzlePsr7Path . '/*.php');
+                foreach ($allPsr7Files as $file) {
+                    if (basename($file) !== 'functions_include.php' && !in_array(basename($file), $psr7BaseFiles)) {
+                        try {
+                            require_once $file;
+                        } catch (\Throwable $e) {
+                            error_log("WARNING: Error loading " . basename($file) . ": " . $e->getMessage());
+                        }
                     }
                 }
             }
