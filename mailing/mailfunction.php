@@ -212,17 +212,32 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         // Instantiate Resend client
         // The autoloader should handle GuzzleHttp\Client when Resend::client() uses it
+        // But if it's not working, we need to ensure the autoloader is properly set up
         try {
-            // Ensure GuzzleHttp is available - trigger autoloader explicitly
-            if (!class_exists('GuzzleHttp\Client', true)) {
-                error_log("WARNING: GuzzleHttp\Client not found, triggering autoloader");
-                spl_autoload_call('GuzzleHttp\Client');
-                // Also try to load common GuzzleHttp dependencies
-                spl_autoload_call('GuzzleHttp\ClientTrait');
-                spl_autoload_call('GuzzleHttp\HandlerStack');
-                spl_autoload_call('GuzzleHttp\Utils');
+            // Verify autoloader is working by checking a known class
+            if (!class_exists('PHPMailer\PHPMailer\PHPMailer', false)) {
+                error_log("WARNING: PHPMailer not found - autoloader may not be working");
+            } else {
+                error_log("Autoloader is working (PHPMailer found)");
             }
             
+            // Try to ensure GuzzleHttp is available
+            // The autoloader should handle this automatically when Resend uses it
+            if (!class_exists('GuzzleHttp\Client', true)) {
+                error_log("WARNING: GuzzleHttp\Client not found via autoloader");
+                // Try triggering autoloader - it should work if autoloader is properly set up
+                spl_autoload_call('GuzzleHttp\Client');
+                if (class_exists('GuzzleHttp\Client', false)) {
+                    error_log("GuzzleHttp\Client loaded via spl_autoload_call");
+                } else {
+                    error_log("ERROR: GuzzleHttp\Client still not found after spl_autoload_call");
+                    error_log("This suggests the autoloader may not be properly configured for GuzzleHttp");
+                }
+            } else {
+                error_log("GuzzleHttp\Client found via autoloader");
+            }
+            
+            // Now try to use Resend - the autoloader should handle GuzzleHttp when Resend needs it
             $resend = $resendClass::client($resend_api_key);
             error_log("Resend: Client initialized successfully using class: " . $resendClass);
         } catch (\Exception $e) {
