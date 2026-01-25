@@ -73,7 +73,11 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $resend_api_key = getenv('RESEND_API_KEY') ?: ($_ENV['RESEND_API_KEY'] ?? "");
     if (!empty($resend_api_key)) {
         error_log("Using Resend API for email delivery (API key length: " . strlen($resend_api_key) . ")");
-        return sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        $resendResult = sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        if ($resendResult === true) {
+            return true; // Success, no need to try other services
+        }
+        error_log("Resend failed, trying other email services...");
     } else {
         error_log("RESEND_API_KEY not found via getenv() or \$_ENV, checking other services...");
         error_log("Available env vars starting with RESEND: " . implode(", ", array_filter(array_keys($_ENV), function($k) { return strpos($k, 'RESEND') === 0; })));
@@ -84,14 +88,22 @@ function mailfunction($mail_reciever_email, $mail_reciever_name, $mail_msg, $att
     $mailgun_domain = getenv('MAILGUN_DOMAIN') ?: "";
     if (!empty($mailgun_api_key) && !empty($mailgun_domain)) {
         error_log("Using Mailgun API for email delivery");
-        return sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        $mailgunResult = sendEmailViaMailgun($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        if ($mailgunResult === true) {
+            return true; // Success, no need to try other services
+        }
+        error_log("Mailgun failed, trying other email services...");
     }
     
     // 3. SendGrid (Good balance)
     $sendgrid_api_key = getenv('SENDGRID_API_KEY') ?: "";
     if (!empty($sendgrid_api_key)) {
         error_log("Using SendGrid API for email delivery");
-        return sendEmailViaSendGrid($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        $sendgridResult = sendEmailViaSendGrid($mail_reciever_email, $mail_reciever_name, $mail_msg, $attachment);
+        if ($sendgridResult === true) {
+            return true; // Success, no need to try other services
+        }
+        error_log("SendGrid failed, trying SMTP...");
     }
     
     // 4. Fallback to SMTP (may not work on Railway due to blocked ports)
