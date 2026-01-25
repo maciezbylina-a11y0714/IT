@@ -8,8 +8,8 @@
 
     $body = "<ul><li>Name: ".$name."</li><li>Phone: ".$phone."</li><li>Email: ".$email."</li><li>Message: ".$message."</li></ul>";
 
-    $receiver_email = getenv('RECEIVER_EMAIL') ?: ""; // Get from environment variable or use empty string
-    $status = mailfunction($receiver_email, "Company", $body); //reciever
+    $receiver_email = getenv('RECEIVER_EMAIL') ?: ""; // Get from environment variable (set to your Gmail in Railway)
+    $status = mailfunction($receiver_email, "Allyson Tech Solutions", $body); //reciever
     if($status)
         echo '<center><h1>Thanks! We will contact you soon.</h1></center>';
     else

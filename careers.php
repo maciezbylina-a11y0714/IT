@@ -22,8 +22,8 @@
     $body = "<ul><li>Name: ".$name."</li><li>Phone: ".$phone."</li><li>Email: ".$email."</li><li>Apply For: ".$applyfor."</li><li>Experience: ".$experience." Yrs.</li><li>Resume(Attached Below):</li></ul>";
 	if(move_uploaded_file($tempfile, $filenameWithDirectory))
 	{
-		$receiver_email = getenv('RECEIVER_EMAIL') ?: ""; // Get from environment variable or use empty string
-		$status = mailfunction($receiver_email, "Company", $body, $filenameWithDirectory); //reciever
+		$receiver_email = getenv('RECEIVER_EMAIL') ?: ""; // Get from environment variable (set to your Gmail in Railway)
+		$status = mailfunction($receiver_email, "Allyson Tech Solutions", $body, $filenameWithDirectory); //reciever
         if($status)
             echo '<center><h1>Thanks! We will contact you soon.</h1></center>';
         else
