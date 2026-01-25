@@ -30,33 +30,122 @@ if (file_exists($autoloadPath)) {
     
     // Ensure GuzzleHttp is available (required by Resend)
     // GuzzleHttp should be autoloaded by Composer, but if it's not working,
-    // we'll try to trigger the autoloader explicitly
+    // we'll manually load it
     if (!class_exists('GuzzleHttp\Client', true)) {
         error_log("WARNING: GuzzleHttp\Client not found via autoloader");
-        error_log("Attempting to trigger autoloader for GuzzleHttp dependencies...");
+        error_log("Attempting to manually load GuzzleHttp...");
         
-        // Try to trigger autoloader for GuzzleHttp and its dependencies
-        $guzzleClasses = [
-            'GuzzleHttp\Promise\PromiseInterface',
-            'GuzzleHttp\Promise\Promise',
-            'GuzzleHttp\Exception\GuzzleException',
-            'GuzzleHttp\Exception\RequestException',
-            'GuzzleHttp\HandlerStack',
-            'GuzzleHttp\Client'
-        ];
+        $guzzleBasePath = __DIR__ . '/../vendor/guzzlehttp/guzzle/src';
         
-        foreach ($guzzleClasses as $className) {
-            spl_autoload_call($className);
-        }
-        
-        // Check again
-        if (class_exists('GuzzleHttp\Client', false)) {
-            error_log("GuzzleHttp\Client loaded via autoloader trigger");
+        if (is_dir($guzzleBasePath)) {
+            // Load GuzzleHttp files in dependency order
+            // First, load PSR interfaces that GuzzleHttp depends on
+            $psrHttpClientPath = __DIR__ . '/../vendor/psr/http-client/src';
+            if (is_dir($psrHttpClientPath)) {
+                $psrFiles = [
+                    'ClientInterface.php',
+                    'ClientExceptionInterface.php',
+                    'NetworkExceptionInterface.php',
+                    'RequestExceptionInterface.php'
+                ];
+                foreach ($psrFiles as $file) {
+                    $fullPath = $psrHttpClientPath . '/' . $file;
+                    if (file_exists($fullPath)) {
+                        require_once $fullPath;
+                    }
+                }
+            }
+            
+            // Load GuzzleHttp Promise classes first (dependencies)
+            $promisePath = $guzzleBasePath . '/Promise';
+            if (is_dir($promisePath)) {
+                $promiseFiles = [
+                    'PromiseInterface.php',
+                    'Create.php',
+                    'Promise.php',
+                    'RejectionException.php',
+                    'TaskQueue.php',
+                    'TaskQueueInterface.php',
+                    'Utils.php'
+                ];
+                foreach ($promiseFiles as $file) {
+                    $fullPath = $promisePath . '/' . $file;
+                    if (file_exists($fullPath)) {
+                        require_once $fullPath;
+                    }
+                }
+            }
+            
+            // Load GuzzleHttp PSR7 classes
+            $guzzlePsr7Path = __DIR__ . '/../vendor/guzzlehttp/psr7/src';
+            if (is_dir($guzzlePsr7Path)) {
+                // Load PSR-7 interfaces first
+                $psrMessagePath = __DIR__ . '/../vendor/psr/http-message/src';
+                if (is_dir($psrMessagePath)) {
+                    $psrMessageFiles = glob($psrMessagePath . '/*.php');
+                    foreach ($psrMessageFiles as $file) {
+                        require_once $file;
+                    }
+                }
+                
+                // Then load GuzzleHttp PSR7 implementations
+                $psr7Files = glob($guzzlePsr7Path . '/*.php');
+                foreach ($psr7Files as $file) {
+                    if (basename($file) !== 'functions_include.php') {
+                        require_once $file;
+                    }
+                }
+            }
+            
+            // Load GuzzleHttp Exception classes
+            $exceptionPath = $guzzleBasePath . '/Exception';
+            if (is_dir($exceptionPath)) {
+                $exceptionFiles = [
+                    'GuzzleException.php',
+                    'TransferException.php',
+                    'RequestException.php',
+                    'BadResponseException.php',
+                    'ClientException.php',
+                    'ServerException.php',
+                    'TooManyRedirectsException.php',
+                    'ConnectException.php'
+                ];
+                foreach ($exceptionFiles as $file) {
+                    $fullPath = $exceptionPath . '/' . $file;
+                    if (file_exists($fullPath)) {
+                        require_once $fullPath;
+                    }
+                }
+            }
+            
+            // Load GuzzleHttp core classes
+            $coreFiles = [
+                'HandlerStack.php',
+                'RequestOptions.php',
+                'Utils.php',
+                'ClientTrait.php',
+                'Client.php'
+            ];
+            foreach ($coreFiles as $file) {
+                $fullPath = $guzzleBasePath . '/' . $file;
+                if (file_exists($fullPath)) {
+                    require_once $fullPath;
+                }
+            }
+            
+            // Check if it worked
+            if (class_exists('GuzzleHttp\Client', false)) {
+                error_log("GuzzleHttp\Client loaded manually successfully");
+            } else {
+                error_log("ERROR: GuzzleHttp\Client still not found after manual load");
+                error_log("GuzzleHttp base path: " . $guzzleBasePath);
+                error_log("GuzzleHttp base path exists: " . (is_dir($guzzleBasePath) ? "YES" : "NO"));
+            }
         } else {
-            error_log("ERROR: GuzzleHttp\Client still not found - autoloader may not be properly configured");
-            error_log("This may indicate a problem with Composer's autoloader generation");
-            error_log("Resend will not work - will fall back to other email services");
+            error_log("ERROR: GuzzleHttp package directory not found at: " . $guzzleBasePath);
         }
+    } else {
+        error_log("GuzzleHttp\Client found via autoloader");
     }
 } else {
     // Fallback to relative path
