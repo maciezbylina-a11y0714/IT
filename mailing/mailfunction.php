@@ -54,21 +54,26 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
         
         error_log("Resend: Initializing client with API key (length: " . strlen($resend_api_key) . ")");
         
-        // Ensure autoloader is working - try to trigger autoload for Resend class
-        // The autoloader should handle all dependencies automatically
+        // Use autoloader to load Resend class and all its dependencies
+        // The 'true' parameter triggers autoloading which will load all required classes
         if (!class_exists('Resend', true)) {
-            error_log("ERROR: Resend class not found after autoload attempt.");
+            error_log("ERROR: Resend class not found. Autoloader may not be working.");
             error_log("Vendor directory exists: " . (is_dir(__DIR__ . '/../vendor') ? "YES" : "NO"));
             error_log("Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? "YES" : "NO"));
             
-            // Try to manually require autoloader again
-            if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-                require_once __DIR__ . '/../vendor/autoload.php';
-                error_log("Resend: Re-required autoloader");
-                
-                // Try again
-                if (!class_exists('Resend', true)) {
-                    error_log("ERROR: Resend class still not found after re-requiring autoloader");
+            // Check if vendor/autoload.php was loaded
+            if (!class_exists('Composer\Autoload\ClassLoader', false)) {
+                error_log("ERROR: Composer autoloader not loaded. Re-requiring vendor/autoload.php");
+                if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+                    require_once __DIR__ . '/../vendor/autoload.php';
+                    
+                    // Try again with autoload
+                    if (!class_exists('Resend', true)) {
+                        error_log("ERROR: Resend class still not found after re-requiring autoloader");
+                        return false;
+                    }
+                } else {
+                    error_log("ERROR: vendor/autoload.php not found!");
                     return false;
                 }
             } else {
@@ -76,7 +81,7 @@ function sendEmailViaResend($mail_reciever_email, $mail_reciever_name, $mail_msg
             }
         }
         
-        // Instantiate Resend client (class is in global namespace, autoloader handles dependencies)
+        // Instantiate Resend client (class is in global namespace, autoloader handles all dependencies)
         try {
             $resend = Resend::client($resend_api_key);
             error_log("Resend: Client initialized successfully");
