@@ -763,6 +763,21 @@ body{
             margin-bottom: 30px;
         }
         
+        /* Align footer columns at the top */
+        .footer .footer-top .row {
+            align-items: flex-start !important;
+        }
+        
+        .footer .footer-top .row > div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer .footer-top .footer-links,
+        .footer .footer-top .footer-newsletter {
+            height: 100%;
+        }
+        
         .footer .footer-top .social-links a {
             font-size: 18px;
             display: inline-block;
