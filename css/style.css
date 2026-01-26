@@ -772,6 +772,7 @@ body{
         /* Align footer columns at the top */
         .footer .footer-top .row {
             align-items: flex-start !important;
+            margin-left: 5%;
         }
         
         .footer .footer-top .row > div {
