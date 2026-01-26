@@ -113,53 +113,86 @@
     </div>
 </section>
 
-<div class="pt-5 pb-5">
+<div class="pt-5 pb-5" id="portfolio">
     <div class="container">
       <div class="row">
         <div class="section-head-1 col-sm-12" style="text-align: center;">
-          <h4 style="margin-top: -5rem;" id="portfolio"><span>Our</span> Projects</h4>
-          
+          <h4 style="margin-top: -5rem;"><span>Our</span> Projects</h4>
           <p>Allyson Tech Solutions is a professional fullstack development IT company specializing in <br>cutting-edge web applications, automation solutions, and data-driven technologies.<br> We deliver end-to-end development services from frontend to backend, ensuring scalable and robust solutions.
             </p>
         </div>
-        
-        <div class="col-lg-4 col-sm-6">
-          
-          <div class="item"> <span class="icon feature_box_col_four"><i class="fa fa-database"></i></span>
-            <h6>Enterprise Web Applications</h6>
-            
-            <p>Full-stack web development solutions with modern frameworks. We build scalable applications with React, Node.js, and cloud infrastructure for businesses of all sizes.<br><br></p>
+      </div>
+      
+      <div class="row portfolio-grid" style="margin-top: 3rem;">
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/trading-bot.jpg" alt="CryptoTrader Pro" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-line-chart\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Trading Bot</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">CryptoTrader Pro</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Automated cryptocurrency trading platform with real-time market analysis, advanced risk management algorithms, and comprehensive backtesting capabilities. Built with Python and integrated with major exchanges.</p>
+            </div>
           </div>
         </div>
         
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_five"><i class="fa fa-mobile"></i></span>
-            <h6>Mobile App Development</h6>
-            <p>Cross-platform mobile applications using React Native and Flutter. We create responsive, high-performance apps for iOS and Android platforms.<br><br></p>
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/web-scraping.jpg" alt="PriceScout Analytics" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-code\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Data Analysis</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">PriceScout Analytics</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Python-based web scraping and price analysis system for competitive market research. Features automated data collection, real-time price monitoring, and advanced analytics dashboards for business intelligence.</p>
+            </div>
           </div>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_six"><i class="fa fa-cloud"></i></span>
-            <h6>Cloud Solutions & DevOps</h6>
-            <p>Cloud infrastructure setup, CI/CD pipelines, and containerization. We help businesses migrate to cloud platforms and optimize their deployment workflows.<br><br></p>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/api-platform.jpg" alt="API Gateway Hub" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-cogs\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>API Platform</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">API Gateway Hub</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Comprehensive RESTful and GraphQL API development platform with third-party integrations. Features authentication, rate limiting, monitoring, and seamless data exchange for enterprise applications.</p>
+            </div>
           </div>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_four"><i class="fa fa-line-chart"></i></span>
-            <h6>Trading Bot Development</h6>
-            <p>Automated trading systems and algorithmic trading bots. We develop sophisticated trading algorithms with real-time market analysis, risk management, and backtesting capabilities.<br><br></p>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/cloud-devops.jpg" alt="CloudSync Enterprise" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-cloud\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Cloud Platform</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">CloudSync Enterprise</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Cloud infrastructure migration and DevOps automation platform. Includes CI/CD pipeline setup, containerization with Docker/Kubernetes, and cloud optimization for scalable business operations.</p>
+            </div>
           </div>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_five"><i class="fa fa-code"></i></span>
-            <h6>Python Web Scraping & Data Analysis</h6>
-            <p>Price analysis tools and data extraction solutions. We build Python scraping systems for market research, competitive analysis, and automated data collection with advanced analytics.<br><br></p>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/mobile-app.jpg" alt="MobilePay App" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-mobile\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Mobile App</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">MobilePay App</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Cross-platform mobile payment application built with React Native. Features secure transactions, biometric authentication, and seamless integration with banking APIs for iOS and Android platforms.</p>
+            </div>
           </div>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_six"><i class="fa fa-cogs"></i></span>
-            <h6>API Development & Integration</h6>
-            <p>RESTful and GraphQL API development with third-party integrations. We create robust APIs for seamless data exchange and build custom integrations for your business needs.<br><br></p>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+            <div class="portfolio-image" style="width: 100%; height: 250px; overflow: hidden; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="./images/projects/web-app.jpg" alt="WebFlow CMS" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-database\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Web Application</h5></div>'">
+            </div>
+            <div class="portfolio-content" style="padding: 1.5rem;">
+              <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">WebFlow CMS</h5>
+              <p style="color: #666; line-height: 1.6; margin: 0;">Enterprise-grade content management system built with React and Node.js. Features real-time collaboration, advanced content workflows, and scalable cloud infrastructure for businesses of all sizes.</p>
+            </div>
           </div>
         </div>
       </div>

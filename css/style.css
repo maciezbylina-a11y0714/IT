@@ -1253,3 +1253,21 @@ body{
             width: 100%;
         }
 }
+
+/* Portfolio Cards Hover Effects */
+.portfolio-card {
+    cursor: pointer;
+}
+
+.portfolio-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.portfolio-image img {
+    transition: transform 0.3s ease;
+}
+
+.portfolio-card:hover .portfolio-image img {
+    transform: scale(1.1);
+}
