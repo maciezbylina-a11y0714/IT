@@ -1259,6 +1259,16 @@ body{
     cursor: pointer;
 }
 
+/* Portfolio card links */
+.portfolio-item a {
+    cursor: pointer;
+    display: block;
+}
+
+.portfolio-item a:hover {
+    text-decoration: none;
+}
+
 .portfolio-card:hover {
     transform: translateY(-8px) !important;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
