@@ -761,12 +761,12 @@ body{
         .footer .footer-top .footer-contact,
         .footer .footer-top .footer-newsletter {
             margin-bottom: 30px;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .footer-top .col-lg-3,
         .footer .footer-top .col-md-6 {
-            text-align: center !important;
+            text-align: left !important;
         }
         
         /* Align footer columns at the top */
@@ -778,13 +778,13 @@ body{
         .footer .footer-top .row > div {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
         }
         
         .footer .footer-top .footer-links,
         .footer .footer-top .footer-newsletter {
             height: 100%;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .footer-top .social-links a {
@@ -815,14 +815,13 @@ body{
             padding-bottom: 12px;
             margin-bottom: 20px;
             letter-spacing: 1px;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .footer-top h4::before {
             content: '';
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
             bottom: 0;
             height: 0;
             width: 50px;
@@ -833,7 +832,7 @@ body{
             list-style: none;
             padding: 0;
             margin: 0;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .footer-top .footer-links ul i {
@@ -846,9 +845,9 @@ body{
         .footer .footer-top .footer-links ul li {
             border-bottom: 1px solid #ffffff;
             padding: 7px 0;
-            text-align: center !important;
+            text-align: left !important;
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
         }
         
@@ -857,13 +856,13 @@ body{
         }
         
         .footer .footer-top .footer-links ul li * {
-            text-align: center;
+            text-align: left;
         }
         
         .footer .footer-top .footer-links ul a {
             font-size: 14px;
             color: #ffffff;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .footer-top .footer-links ul a:hover {
@@ -877,7 +876,7 @@ body{
         
         .footer .footer-top .footer-newsletter form {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             gap: 5px;
         }
@@ -912,7 +911,7 @@ body{
         .footer .footer-top .footer-newsletter p {
             color: #ffffff;
             font-size: 14px;
-            text-align: center !important;
+            text-align: left !important;
         }
         
         .footer .credit,
