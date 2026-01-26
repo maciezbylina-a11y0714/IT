@@ -29,7 +29,6 @@
                 <li><a href="#about">about</a></li>
                 <li><a href="#service">services</a></li>
                 <li><a href="#portfolio">portfolio</a></li>
-                <li><a href="careers.html">career</a></li>
                 <li><a href="#contact">contact</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
@@ -114,54 +113,99 @@
     </div>
 </section>
 
-<div class="pt-5 pb-5">
+<div class="pt-5 pb-5" id="portfolio">
     <div class="container">
       <div class="row">
         <div class="section-head-1 col-sm-12" style="text-align: center;">
-          <h4 style="margin-top: -5rem;" id="portfolio"><span>Our</span> Projects</h4>
-          
+          <h4 style="margin-top: -5rem;"><span>Our</span> Projects</h4>
           <p>Allyson Tech Solutions is a professional fullstack development IT company specializing in <br>cutting-edge web applications, automation solutions, and data-driven technologies.<br> We deliver end-to-end development services from frontend to backend, ensuring scalable and robust solutions.
             </p>
         </div>
-        
-        <div class="col-lg-4 col-sm-6">
-          
-          <div class="item"> <span class="icon feature_box_col_four"><i class="fa fa-database"></i></span>
-            <h6>Enterprise Web Applications</h6>
-            
-            <p>Full-stack web development solutions with modern frameworks. We build scalable applications with React, Node.js, and cloud infrastructure for businesses of all sizes.<br><br></p>
-          </div>
+      </div>
+      
+      <div class="row portfolio-grid" style="margin-top: 3rem;">
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://brasilapi.com.br/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/brasil-api.jpg" alt="BrasilAPI - API Brasileira" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-code\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>API Brasileira</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">BrasilAPI - API de Dados Brasileiros</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Plataforma de API RESTful desenvolvida para disponibilizar dados públicos brasileiros de forma acessível. Integração com dados do IBGE, CEP, CNPJ e outras fontes governamentais para facilitar o desenvolvimento de aplicações brasileiras.</p>
+              </div>
+            </div>
+          </a>
         </div>
         
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_five"><i class="fa fa-mobile"></i></span>
-            <h6>Mobile App Development</h6>
-            <p>Cross-platform mobile applications using React Native and Flutter. We create responsive, high-performance apps for iOS and Android platforms.<br><br></p>
-          </div>
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://queridodiario.ok.org.br/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/querido-diario.jpg" alt="Querido Diário" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-file-text\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Querido Diário</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">Querido Diário - Plataforma Cívica</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Sistema de web scraping e análise de dados para tornar os diários oficiais brasileiros acessíveis. Desenvolvido com Python, oferece coleta automatizada de dados governamentais e análise de transparência pública para cidadãos brasileiros.</p>
+              </div>
+            </div>
+          </a>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_six"><i class="fa fa-cloud"></i></span>
-            <h6>Cloud Solutions & DevOps</h6>
-            <p>Cloud infrastructure setup, CI/CD pipelines, and containerization. We help businesses migrate to cloud platforms and optimize their deployment workflows.<br><br></p>
-          </div>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://logincidadao.rs.gov.br/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/login-cidadao.jpg" alt="Login Cidadão" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-user-shield\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Login Cidadão</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">Login Cidadão - Autenticação Governamental</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Sistema de autenticação unificada para serviços públicos brasileiros. Plataforma desenvolvida para integração com sistemas governamentais, oferecendo login seguro e integração com APIs de serviços públicos do Brasil.</p>
+              </div>
+            </div>
+          </a>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_four"><i class="fa fa-line-chart"></i></span>
-            <h6>Trading Bot Development</h6>
-            <p>Automated trading systems and algorithmic trading bots. We develop sophisticated trading algorithms with real-time market analysis, risk management, and backtesting capabilities.<br><br></p>
-          </div>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://serenatadeamor.org/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/serenata-amor.jpg" alt="Serenata de Amor" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-robot\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Serenata de Amor</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">Serenata de Amor - IA para Controle Social</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Plataforma de inteligência artificial para controle social da administração pública brasileira. Utiliza machine learning e análise de dados para identificar irregularidades em gastos públicos e promover transparência governamental.</p>
+              </div>
+            </div>
+          </a>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_five"><i class="fa fa-code"></i></span>
-            <h6>Python Web Scraping & Data Analysis</h6>
-            <p>Price analysis tools and data extraction solutions. We build Python scraping systems for market research, competitive analysis, and automated data collection with advanced analytics.<br><br></p>
-          </div>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://sabia.ufrn.br/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/plataforma-sabia.jpg" alt="Plataforma Sabiá" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-seedling\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Plataforma Sabiá</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">Plataforma Sabiá - Tecnologias do Semiárido</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Sistema web desenvolvido para catalogar e disponibilizar tecnologias adaptadas ao semiárido brasileiro. Plataforma de gestão de conhecimento com integração de dados regionais e APIs para tecnologias sustentáveis do Nordeste brasileiro.</p>
+              </div>
+            </div>
+          </a>
         </div>
-        <div class="col-lg-4 col-sm-6">
-          <div class="item"> <span class="icon feature_box_col_six"><i class="fa fa-cogs"></i></span>
-            <h6>API Development & Integration</h6>
-            <p>RESTful and GraphQL API development with third-party integrations. We create robust APIs for seamless data exchange and build custom integrations for your business needs.<br><br></p>
-          </div>
+        
+        <div class="col-lg-4 col-md-6 portfolio-item" style="margin-bottom: 2rem;">
+          <a href="https://brasil.io/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+            <div class="portfolio-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;">
+              <div class="portfolio-image" style="width: 100%; height: 280px; overflow: hidden; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); display: flex; align-items: center; justify-content: center;">
+                <img src="./images/projects/brasil-io.jpg" alt="Brasil.IO" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: white;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;text-align:center;padding:20px;\'><i class=\'fa fa-database\' style=\'font-size:60px;margin-bottom:15px;\'></i><h5 style=\'color:white;\'>Brasil.IO</h5></div>'">
+              </div>
+              <div class="portfolio-content" style="padding: 1.5rem;">
+                <h5 style="font-weight: bold; margin-bottom: 0.75rem; color: #333;">Brasil.IO - Dados Públicos Acessíveis</h5>
+                <p style="color: #666; line-height: 1.6; margin: 0;">Plataforma backend para coleta e disponibilização de datasets públicos brasileiros. Sistema de web scraping e processamento de dados que transforma informações governamentais em formatos acessíveis para desenvolvedores e pesquisadores brasileiros.</p>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -173,105 +217,6 @@
     <a href="#contact"><button class="btn">Contact Now</button></a>
 </div>
 
-<div class="testimonials mt-100">
-    <div class="container">
-        <div class="section-header" style="text-align: center;">
-            <h2 style="margin-top: -15rem;">Testimonials</h2>
-            <p style="font-size: 2rem;">
-                See what people have to say about us
-            </p>
-        </div>
-
-        <div class="owl-carousel testimonials-carousel">
-            <div class="testimonial-item row align-items-center">
-                <div class="testimonial-img">
-                    <img src="./images/testimonial-1.jpg" alt="Testimonial image">
-                </div>
-                <div class="testimonial-text">
-                    <h3>Sarah Mitchell</h3>
-                    <h4>CEO, TechStart Innovations</h4>
-                    <p>
-                        Allyson Tech Solutions transformed our business with their exceptional fullstack development services. Their team built a scalable web application that handles our growing user base seamlessly. Professional, reliable, and always delivering on time.
-
-                    </p>
-                </div>
-            </div>
-            <div class="testimonial-item row align-items-center">
-                <div class="testimonial-img">
-                    <img src="./images/testimonial-2.jpg" alt="Testimonial image">
-                </div>
-                <div class="testimonial-text">
-                    <h3>James Rodriguez</h3>
-                    <h4>Financial Analyst, MarketWatch Pro</h4>
-                    <p>
-                        The trading bot developed by Allyson Tech Solutions has revolutionized our trading operations. Their algorithmic trading system with real-time analysis and risk management has significantly improved our trading performance. Highly recommended!
-
-                    </p>
-                </div>
-            </div>
-            <div class="testimonial-item row align-items-center">
-                <div class="testimonial-img">
-                    <img src="./images/testimonial-3.jpg" alt="Testimonial image">
-                </div>
-                <div class="testimonial-text">
-                    <h3>Emily Chen</h3>
-                    <h4>Data Scientist, PriceAnalytics Inc.</h4>
-                    <p>
-                        Their Python web scraping solution for price analysis has been a game-changer for our market research. The automated data collection system is efficient, accurate, and provides valuable insights. Outstanding technical expertise and support.
-
-                    </p>
-                </div>
-            </div>
-            <div class="testimonial-item row align-items-center">
-                <div class="testimonial-img">
-                    <img src="./images/testimonial-4.jpg" alt="Testimonial image">
-                </div>
-                <div class="testimonial-text">
-                    <h3>Michael Thompson</h3>
-                    <h4>CTO, CloudScale Solutions</h4>
-                    <p>
-                        Working with Allyson Tech Solutions on our cloud migration and DevOps setup was excellent. They set up our CI/CD pipelines and containerized our applications perfectly. Their expertise in cloud solutions is top-notch, and the team is very responsive.
-
-                    </p>
-                </div>
-            </div>
-            <div class="testimonial-item row align-items-center">
-                <div class="testimonial-img">
-                    <img src="./images/testimonial-5.jpg" alt="Testimonial image">
-                </div>
-                <div class="testimonial-text">
-                    <h3>Lisa Anderson</h3>
-                    <h4>Product Manager, MobileFirst Apps</h4>
-                    <p>
-                        The mobile application developed by Allyson Tech Solutions exceeded our expectations. Their React Native expertise delivered a cross-platform app that performs flawlessly on both iOS and Android. Professional service from start to finish.
-
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="clients mt-100">
-    <div class="container">
-        <div class="section-header">
-            <h2>Our Clients</h2>
-            <p>
-                We don't just build softwares, we build your business.
-            </p>
-        </div>
-        <div class="owl-carousel clients-carousel">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-            <img src="./images/image.png" alt="Client Logo">
-        </div>
-    </div>
-</div>
 <a href="#" class="back-to-top"><i class="ion-ios-arrow-up"></i></a>
 <script src="lib/jquery/jquery.min.js"></script>
 <script src="lib/jquery/jquery-migrate.min.js"></script>
@@ -381,31 +326,11 @@
                       <h4>Useful Links</h4>
                       <ul>
                           <li><i class="ion-ios-arrow-forward"></i> <a href="#portfolio">Portfolio</a></li>
-                          <li><i class="ion-ios-arrow-forward"></i> <a href="careers.html">Career</a></li>
                           <li><i class="ion-ios-arrow-forward"></i> <a href="#contact">Contact</a></li>
                           <li><i class="ion-ios-arrow-forward"></i> <a href="#faq">FAQ</a></li>
                       </ul>
                   </div>
 
-                  <div class="col-lg-3 col-md-6 footer-contact" style="font-size: 1.5rem;">
-                      <h4>Contact Us</h4>
-                      <p>
-                          Rua Principal, Centro<br>
-                          Caxias, Maranhão<br>
-                          Brazil <br>
-                          <strong>Phone:</strong> +123-456-7890<br>
-                          <strong>Email:</strong> info@example.com<br>
-                      </p>
-
-                      <div class="social-links">
-                          <a href="https://www.facebook.com/"><i class="ion-logo-facebook"></i></a>
-                          <a href="https://twitter.com/login?lang=en"><i class="ion-logo-twitter"></i></a>
-                          <a href="https://www.linkedin.com/"><i class="ion-logo-linkedin"></i></a>
-                          <a href="https://www.instagram.com/"><i class="ion-logo-instagram"></i></a>
-                          <a href="https://accounts.google.com/servicelogin/signinchooser?flowName=GlifWebSignIn&flowEntry=ServiceLogin"><i class="ion-logo-googleplus"></i></a>
-                      </div>
-
-                  </div>
 
                   <div class="col-lg-3 col-md-6 footer-newsletter">
                       <h4>Subscription</h4>

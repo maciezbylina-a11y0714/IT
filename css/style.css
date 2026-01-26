@@ -761,6 +761,12 @@ body{
         .footer .footer-top .footer-contact,
         .footer .footer-top .footer-newsletter {
             margin-bottom: 30px;
+            text-align: center !important;
+        }
+        
+        .footer .footer-top .col-lg-3,
+        .footer .footer-top .col-md-6 {
+            text-align: center !important;
         }
         
         /* Align footer columns at the top */
@@ -771,11 +777,13 @@ body{
         .footer .footer-top .row > div {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         
         .footer .footer-top .footer-links,
         .footer .footer-top .footer-newsletter {
             height: 100%;
+            text-align: center !important;
         }
         
         .footer .footer-top .social-links a {
@@ -806,7 +814,7 @@ body{
             padding-bottom: 12px;
             margin-bottom: 20px;
             letter-spacing: 1px;
-            text-align: center;
+            text-align: center !important;
         }
         
         .footer .footer-top h4::before {
@@ -824,28 +832,37 @@ body{
             list-style: none;
             padding: 0;
             margin: 0;
-            text-align: center;
+            text-align: center !important;
         }
         
         .footer .footer-top .footer-links ul i {
             padding-right: 8px;
             color: #ffffff;
             font-size: 16px;
+            display: inline-block;
         }
         
         .footer .footer-top .footer-links ul li {
             border-bottom: 1px solid #ffffff;
             padding: 7px 0;
-            text-align: center;
+            text-align: center !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .footer .footer-top .footer-links ul li:first-child {
             padding-top: 0;
         }
         
+        .footer .footer-top .footer-links ul li * {
+            text-align: center;
+        }
+        
         .footer .footer-top .footer-links ul a {
             font-size: 14px;
             color: #ffffff;
+            text-align: center !important;
         }
         
         .footer .footer-top .footer-links ul a:hover {
@@ -894,7 +911,7 @@ body{
         .footer .footer-top .footer-newsletter p {
             color: #ffffff;
             font-size: 14px;
-            text-align: center;
+            text-align: center !important;
         }
         
         .footer .credit,
