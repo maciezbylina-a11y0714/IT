@@ -763,6 +763,21 @@ body{
             margin-bottom: 30px;
         }
         
+        /* Align footer columns at the top */
+        .footer .footer-top .row {
+            align-items: flex-start !important;
+        }
+        
+        .footer .footer-top .row > div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer .footer-top .footer-links,
+        .footer .footer-top .footer-newsletter {
+            height: 100%;
+        }
+        
         .footer .footer-top .social-links a {
             font-size: 18px;
             display: inline-block;
@@ -791,12 +806,14 @@ body{
             padding-bottom: 12px;
             margin-bottom: 20px;
             letter-spacing: 1px;
+            text-align: center;
         }
         
         .footer .footer-top h4::before {
             content: '';
             position: absolute;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             bottom: 0;
             height: 0;
             width: 50px;
@@ -807,6 +824,7 @@ body{
             list-style: none;
             padding: 0;
             margin: 0;
+            text-align: center;
         }
         
         .footer .footer-top .footer-links ul i {
@@ -818,6 +836,7 @@ body{
         .footer .footer-top .footer-links ul li {
             border-bottom: 1px solid #ffffff;
             padding: 7px 0;
+            text-align: center;
         }
         
         .footer .footer-top .footer-links ul li:first-child {
@@ -836,6 +855,13 @@ body{
         .footer .footer-top .footer-contact p {
             color: #ffffff;
             line-height: 26px;
+        }
+        
+        .footer .footer-top .footer-newsletter form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
         
         .footer .footer-top .footer-newsletter input[type="email"] {
@@ -868,6 +894,7 @@ body{
         .footer .footer-top .footer-newsletter p {
             color: #ffffff;
             font-size: 14px;
+            text-align: center;
         }
         
         .footer .credit,
@@ -1252,4 +1279,47 @@ body{
         .faq .row .accordion-container{
             width: 100%;
         }
+}
+
+/* Portfolio Cards Hover Effects */
+.portfolio-card {
+    cursor: pointer;
+}
+
+/* Portfolio card links */
+.portfolio-item a {
+    cursor: pointer;
+    display: block;
+}
+
+.portfolio-item a:hover {
+    text-decoration: none;
+}
+
+.portfolio-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.portfolio-image {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.portfolio-image img {
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    border-radius: 4px;
+}
+
+.portfolio-card:hover .portfolio-image img {
+    transform: scale(1.05);
 }
