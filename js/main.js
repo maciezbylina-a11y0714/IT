@@ -68,4 +68,32 @@ $('.accordion-header').click(function(){
     $(this).children('span').text('-');
 });
 
+    // Portfolio pagination (6 per page)
+    if ($('.portfolio-pagination').length) {
+        var $items = $('.portfolio-item[data-page]');
+        var totalPages = 2;
+
+        function showPage(page) {
+            page = Math.max(1, Math.min(page, totalPages));
+            $items.removeClass('visible').filter('[data-page="' + page + '"]').addClass('visible');
+            $('.portfolio-pagination .page-item').removeClass('active disabled');
+            $('.portfolio-pagination .page-link[data-goto="' + page + '"]').parent().addClass('active');
+            $('.portfolio-pagination .page-link[data-goto="prev"]').parent().toggleClass('disabled', page === 1);
+            $('.portfolio-pagination .page-link[data-goto="next"]').parent().toggleClass('disabled', page === totalPages);
+        }
+
+        $('.portfolio-pagination').on('click', '.page-link', function(e) {
+            e.preventDefault();
+            if ($(this).parent().hasClass('disabled')) return;
+            var goto = $(this).data('goto');
+            var $active = $('.portfolio-pagination .page-item.active .page-link[data-goto="1"], .portfolio-pagination .page-item.active .page-link[data-goto="2"]');
+            var current = parseInt($active.data('goto'), 10) || 1;
+            if (goto === 'prev') showPage(current - 1);
+            else if (goto === 'next') showPage(current + 1);
+            else if (goto === 1 || goto === 2) showPage(goto);
+        });
+
+        showPage(1);
+    }
+
 });

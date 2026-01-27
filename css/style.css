@@ -1348,3 +1348,45 @@ body{
 .portfolio-card:hover .portfolio-image img {
     transform: scale(1.05);
 }
+
+/* Portfolio pagination */
+.portfolio-pagination {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.portfolio-pagination .pagination {
+    margin: 0;
+}
+
+.portfolio-pagination .page-link {
+    color: #002e5f;
+    border: 1px solid #002e5f;
+    padding: 0.5rem 1rem;
+    margin: 0 0.2rem;
+}
+
+.portfolio-pagination .page-item.active .page-link {
+    background: #002e5f;
+    color: #fff;
+    border-color: #002e5f;
+}
+
+.portfolio-pagination .page-link:hover {
+    background: #00bfff;
+    color: #fff;
+    border-color: #00bfff;
+}
+
+.portfolio-pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.portfolio-item[data-page] {
+    display: none !important;
+}
+
+.portfolio-item[data-page].visible {
+    display: block !important;
+}
