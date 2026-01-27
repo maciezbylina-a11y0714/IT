@@ -929,6 +929,14 @@ body{
                 text-align: left;
             }
         }
+        
+        .footer .footer-github {
+            display: inline-block;
+        }
+        
+        .footer .footer-github:hover i {
+            color: #00bfff !important;
+        }
 
         .back-to-top {
             position: fixed;
