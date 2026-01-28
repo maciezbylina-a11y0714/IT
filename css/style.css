@@ -108,11 +108,30 @@ body{
     position: fixed;
 }
 
+.header .logo{
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    z-index: 101;
+    transition: opacity 0.3s ease;
+}
+
+.header .logo:hover{
+    opacity: 0.9;
+}
+
 .header .logo img{
-    width: 130%;
-    height: 3rem;
-    top: 0;
-    left: 0;
+    height: 50px;
+    width: auto;
+    max-width: 200px;
+    min-width: 120px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.header .logo:hover img{
+    transform: scale(1.05);
 }
 
 .header .navbar ul{
@@ -1041,11 +1060,10 @@ body{
     }
 
     .header .logo img{
-        width: 20%;
-        height: 3rem;
-        top: 0;
-        left: 0;
-        background-size: cover;
+        height: 40px;
+        width: auto;
+        max-width: 180px;
+        object-fit: contain;
     }
 
     .header .fa-bars{
