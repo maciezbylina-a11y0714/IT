@@ -40,7 +40,7 @@
     error_log("Attempting to send email to: " . $receiver_email);
     error_log("Using sender: " . $mail_username);
     
-    $status = mailfunction($receiver_email, "Allyson Tech Solutions", $body); //reciever
+    $status = mailfunction($receiver_email, "Apollo Technology", $body); //reciever
     
     if($status) {
         error_log("Email sent successfully to: " . $receiver_email);

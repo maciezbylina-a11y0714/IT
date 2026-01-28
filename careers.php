@@ -53,7 +53,7 @@
 		
 		error_log("Attempting to send email to: " . $receiver_email);
 		
-		$status = mailfunction($receiver_email, "Allyson Tech Solutions", $body, $filenameWithDirectory); //reciever
+		$status = mailfunction($receiver_email, "Apollo Technology", $body, $filenameWithDirectory); //reciever
         if($status) {
 			error_log("Email sent successfully to: " . $receiver_email);
             echo '<center><h1>Thanks! We will contact you soon.</h1></center>';
